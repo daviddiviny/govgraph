@@ -11,7 +11,14 @@ export const sourceFamilySchema = z.enum([
   "parliament",
 ]);
 
-export const sourceTypeSchema = z.enum(["html", "pdf", "xlsx", "csv", "api"]);
+export const sourceTypeSchema = z.enum([
+  "html",
+  "pdf",
+  "docx",
+  "xlsx",
+  "csv",
+  "api",
+]);
 
 export const sourceDocumentSchema = z.object({
   id: z.string().uuid(),

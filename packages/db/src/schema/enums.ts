@@ -55,6 +55,7 @@ export const aliasTypeEnum = pgEnum("alias_type", [
 export const sourceTypeEnum = pgEnum("source_type", [
   "html",
   "pdf",
+  "docx",
   "xlsx",
   "csv",
   "api",
