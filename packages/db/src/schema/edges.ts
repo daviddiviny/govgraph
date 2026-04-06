@@ -1,4 +1,11 @@
-import { date, index, pgTable, text, uuid } from "drizzle-orm/pg-core";
+import {
+  date,
+  index,
+  pgTable,
+  primaryKey,
+  text,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 import { edgeTypeEnum, recordStatusEnum } from "./enums";
 import { nodes } from "./nodes";
@@ -18,9 +25,6 @@ export const edges = pgTable(
     validFrom: date("valid_from"),
     validTo: date("valid_to"),
     status: recordStatusEnum("status").notNull().default("active"),
-    sourceDocumentId: uuid("source_document_id").references(
-      () => sourceDocuments.id,
-    ),
     notes: text("notes"),
   },
   (table) => ({
@@ -28,6 +32,26 @@ export const edges = pgTable(
       table.edgeType,
       table.fromNodeId,
       table.toNodeId,
+    ),
+  }),
+);
+
+export const edgeSourceDocuments = pgTable(
+  "edge_source_documents",
+  {
+    edgeId: uuid("edge_id")
+      .notNull()
+      .references(() => edges.id, { onDelete: "cascade" }),
+    sourceDocumentId: uuid("source_document_id")
+      .notNull()
+      .references(() => sourceDocuments.id, { onDelete: "cascade" }),
+  },
+  (table) => ({
+    pk: primaryKey({
+      columns: [table.edgeId, table.sourceDocumentId],
+    }),
+    sourceDocumentIdx: index("edge_source_documents_source_document_idx").on(
+      table.sourceDocumentId,
     ),
   }),
 );

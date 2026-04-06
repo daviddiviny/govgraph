@@ -9,11 +9,22 @@ import { createSourceDocument } from "../shared/source-document";
 export const VPSC_PORTFOLIOS_URL =
   "https://www.vpsc.vic.gov.au/working-public-sector/conduct-integrity-and-values/working-ministers/working-ministerial-officer/portfolios";
 
+const LIVE_FETCH_TIMEOUT_MS = 10_000;
+
 function deriveDepartmentName(groupName: string, description: string): string {
   const match = description.match(
     /The (Department of [^.]+?)\s(?:supports|provides|leads|is|focuses)/i,
   );
-  return match?.[1]?.trim() ?? `Department of ${groupName}`;
+  if (match?.[1]) {
+    return match[1].trim();
+  }
+
+  console.warn("VPSC department name fallback used.", {
+    groupName,
+    description,
+  });
+
+  return `Department of ${groupName}`;
 }
 
 export function parseVpscPortfolios(html: string): VpscPortfolioDataset {
@@ -79,7 +90,9 @@ export function parseVpscPortfolios(html: string): VpscPortfolioDataset {
 }
 
 export async function fetchVpscPortfolios(): Promise<VpscPortfolioDataset> {
-  const response = await fetch(VPSC_PORTFOLIOS_URL);
+  const response = await fetch(VPSC_PORTFOLIOS_URL, {
+    signal: AbortSignal.timeout(LIVE_FETCH_TIMEOUT_MS),
+  });
   if (!response.ok) {
     throw new Error(`VPSC portfolios request failed with ${response.status}`);
   }

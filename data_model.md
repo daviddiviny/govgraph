@@ -88,8 +88,17 @@ create table edges (
   valid_from date,
   valid_to date,
   status text not null default 'active',
-  source_document_id uuid references source_documents(id),
   notes text
+);
+```
+
+When an edge is supported by more than one source document, keep those links in a join table.
+
+```sql
+create table edge_source_documents (
+  edge_id uuid not null references edges(id),
+  source_document_id uuid not null references source_documents(id),
+  primary key (edge_id, source_document_id)
 );
 ```
 

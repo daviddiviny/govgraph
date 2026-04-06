@@ -8,6 +8,8 @@ import { createSourceDocument } from "../shared/source-document";
 export const PARLIAMENT_MINISTRY_URL =
   "https://www.parliament.vic.gov.au/portfolios/";
 
+const LIVE_FETCH_TIMEOUT_MS = 10_000;
+
 function absolutize(path: string): string {
   return new URL(path, PARLIAMENT_MINISTRY_URL).toString();
 }
@@ -60,7 +62,9 @@ export function parseParliamentGovernmentMinistry(html: string): MinistryDataset
 }
 
 export async function fetchParliamentGovernmentMinistry(): Promise<MinistryDataset> {
-  const response = await fetch(PARLIAMENT_MINISTRY_URL);
+  const response = await fetch(PARLIAMENT_MINISTRY_URL, {
+    signal: AbortSignal.timeout(LIVE_FETCH_TIMEOUT_MS),
+  });
   if (!response.ok) {
     throw new Error(`Parliament ministry request failed with ${response.status}`);
   }
