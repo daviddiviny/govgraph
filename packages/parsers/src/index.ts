@@ -2,6 +2,7 @@ export * from "./budget/index";
 export * from "./budget/bp3";
 export * from "./budget/performance-measures";
 export * from "./catalog-loader";
+export * from "./general-order/kanon";
 export * from "./general-order/vicgov";
 export * from "./ministry/parliament";
 export * from "./source-registry";

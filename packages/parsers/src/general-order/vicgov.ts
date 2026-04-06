@@ -5,12 +5,19 @@ import {
   type GeneralOrderActEntry,
   type GeneralOrderDataset,
   type GeneralOrderRule,
-  type ProvisionReference,
 } from "@govgraph/domain";
 
 import { generalOrderFixture } from "../fixtures/general-order.fixture";
 import { parseHumanDate } from "../shared/date";
 import { createSourceDocument } from "../shared/source-document";
+import {
+  assistPartialGeneralOrderRulesWithKanon,
+  type AssistGeneralOrderWithKanonOptions,
+} from "./kanon";
+import {
+  extractProvisionReferencesFromText,
+  normalizeGeneralOrderText,
+} from "./shared";
 
 export const VIC_GOV_GENERAL_ORDER_URL =
   "https://www.vic.gov.au/general-order-effective-30-october-2025";
@@ -34,12 +41,7 @@ type AdministrationDetails = {
 };
 
 function normalizeText(value: string): string {
-  return value
-    .replace(/\u00a0/g, " ")
-    .replace(/[\u2010\u2011\u2012\u2013\u2014]/g, "-")
-    .replace(/Attorney-\s+General/g, "Attorney-General")
-    .replace(/\s+/g, " ")
-    .trim();
+  return normalizeGeneralOrderText(value);
 }
 
 function stripOuterParentheses(value: string): string {
@@ -230,45 +232,6 @@ function parseAdministrationDetails(
   };
 }
 
-function extractProvisionReferences(scopeText: string): ProvisionReference[] {
-  const normalized = normalizeText(scopeText);
-  const references: ProvisionReference[] = [];
-  const referencePattern =
-    /\b(Sections?|Parts?|Divisions?|Subdivisions?|Chapters?|Schedules?)\s+([^;]+?)(?=(?:,\s*(?:Sections?|Parts?|Divisions?|Subdivisions?|Chapters?|Schedules?)\b)|(?:\s+(?:and|or)\s+(?:Sections?|Parts?|Divisions?|Subdivisions?|Chapters?|Schedules?)\b)|$)/gi;
-
-  for (const match of normalized.matchAll(referencePattern)) {
-    const unitText = match[1]?.toLowerCase() ?? "";
-    const label = normalizeText(match[2] ?? "");
-
-    if (!label) {
-      continue;
-    }
-
-    let unit: ProvisionReference["unit"] = "other";
-    if (unitText.startsWith("section")) {
-      unit = "section";
-    } else if (unitText.startsWith("part")) {
-      unit = "part";
-    } else if (unitText.startsWith("division")) {
-      unit = "division";
-    } else if (unitText.startsWith("subdivision")) {
-      unit = "subdivision";
-    } else if (unitText.startsWith("chapter")) {
-      unit = "chapter";
-    } else if (unitText.startsWith("schedule")) {
-      unit = "schedule";
-    }
-
-    references.push({
-      rawText: normalizeText(`${match[1]} ${label}`),
-      unit,
-      label,
-    });
-  }
-
-  return references;
-}
-
 function createDefaultWholeActRule(officeName: string): GeneralOrderRule {
   return {
     ruleKind: "default",
@@ -340,7 +303,7 @@ function buildRuleFromText(input: {
     scopeText,
     administeringOfficeNames: administration.administeringOfficeNames,
     administrationMode: administration.administrationMode,
-    provisionReferences: extractProvisionReferences(scopeText),
+    provisionReferences: extractProvisionReferencesFromText(scopeText),
     nestedRawTexts: [],
     parseStatus: nestedStatus,
     ...((administration.unparsedTail || trailingText) && {
@@ -498,13 +461,27 @@ export function parseVicGovGeneralOrder(html: string): GeneralOrderDataset {
   });
 }
 
-export async function fetchVicGovGeneralOrder(): Promise<GeneralOrderDataset> {
+export type FetchVicGovGeneralOrderOptions = {
+  kanonAssistance?: boolean | AssistGeneralOrderWithKanonOptions;
+};
+
+export async function fetchVicGovGeneralOrder(
+  options: FetchVicGovGeneralOrderOptions = {},
+): Promise<GeneralOrderDataset> {
   const response = await fetch(VIC_GOV_GENERAL_ORDER_URL);
   if (!response.ok) {
     throw new Error(`Vic Gov general order request failed with ${response.status}`);
   }
 
-  return parseVicGovGeneralOrder(await response.text());
+  const dataset = parseVicGovGeneralOrder(await response.text());
+  if (!options.kanonAssistance) {
+    return dataset;
+  }
+
+  return assistPartialGeneralOrderRulesWithKanon(
+    dataset,
+    options.kanonAssistance === true ? {} : options.kanonAssistance,
+  );
 }
 
 export function loadFixtureVicGovGeneralOrder(): GeneralOrderDataset {
