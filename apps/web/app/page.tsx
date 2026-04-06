@@ -20,11 +20,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const query = firstQueryValue(q)?.trim();
   const catalog = await loadGovernmentCatalog();
   const results = query ? searchGovernmentCatalog(catalog, query, 12) : [];
-  const featuredNodes = catalog.nodes
-    .filter((node) =>
-      ["person", "portfolio", "department"].includes(node.nodeType),
-    )
-    .slice(0, 6);
+  const featuredNodes = [
+    ...catalog.nodes.filter((node) => node.nodeType === "budget_document").slice(0, 2),
+    ...catalog.nodes.filter((node) => node.nodeType === "public_entity").slice(0, 2),
+    ...catalog.nodes.filter((node) => node.nodeType === "department").slice(0, 2),
+    ...catalog.nodes.filter((node) => node.nodeType === "person").slice(0, 2),
+  ].slice(0, 8);
   const implementedConnectors = sourceRegistry.filter(
     (entry) => entry.implementationStatus === "implemented",
   );
@@ -38,25 +39,27 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <div className="space-y-6">
             <div className="flex flex-wrap gap-3">
               <Badge>Official source first</Badge>
-              <Badge>Sprint 1 prototype</Badge>
+              <Badge>Sprint 2 underway</Badge>
             </div>
             <div className="space-y-4">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--govgraph-muted)]">
                 Victorian Government Map
               </p>
               <h1 className="max-w-4xl text-5xl font-semibold tracking-tight text-[var(--govgraph-ink)] sm:text-6xl">
-                A civic atlas for ministers, portfolios, and departments.
+                Search the Victorian Government across structure, entities, and budget papers.
               </h1>
               <p className="max-w-3xl text-base leading-8 text-[var(--govgraph-muted)] sm:text-lg">
-                This first sprint turns the current ministry and VPSC portfolio
-                structure into a searchable graph, with every visible fact
-                linked back to the source pages that produced it.
+                The graph now combines the current ministry and portfolio map
+                with the VPSC employers directory and the Victorian Budget paper
+                index, plus structured budget outputs and performance measures,
+                so public entities and budget records sit beside the core
+                government structure.
               </p>
             </div>
             <SearchForm {...(query ? { defaultValue: query } : {})} />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
             <Card className="p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
                 Live snapshot
@@ -65,8 +68,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 {catalog.summary.totalNodes}
               </p>
               <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
-                nodes across people, portfolios, departments, and the current
-                ministry.
+                records across ministers, departments, public entities, outputs,
+                measures, and budget documents.
               </p>
             </Card>
             <Card className="p-5">
@@ -82,14 +85,24 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </Card>
             <Card className="p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
-                Relationships
+                Public entities
               </p>
               <p className="mt-4 text-4xl font-semibold text-[var(--govgraph-ink)]">
-                {catalog.summary.totalEdges}
+                {catalog.summary.countsByType.public_entity}
               </p>
               <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
-                current links between ministers, portfolios, departments, and
-                the ministry.
+                employer records pulled in from the live VPSC directory snapshot.
+              </p>
+            </Card>
+            <Card className="p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
+                Budget documents
+              </p>
+              <p className="mt-4 text-4xl font-semibold text-[var(--govgraph-ink)]">
+                {catalog.summary.countsByType.budget_document}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
+                indexed papers and budget tools now searchable from the same atlas.
               </p>
             </Card>
           </div>
@@ -146,7 +159,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               Source registry
             </p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[var(--govgraph-ink)]">
-              Sprint 1 connectors
+              Current connectors
             </h2>
           </div>
           <div className="grid gap-4">
