@@ -3,7 +3,7 @@ import { pgEnum } from "drizzle-orm/pg-core";
 export const nodeTypeEnum = pgEnum("node_type", [
   "person",
   "ministry",
-  "portfolio",
+  "ministerial_office",
   "department",
   "administrative_office",
   "public_entity",
@@ -16,7 +16,7 @@ export const nodeTypeEnum = pgEnum("node_type", [
 ]);
 
 export const edgeTypeEnum = pgEnum("edge_type", [
-  "HOLDS_PORTFOLIO",
+  "HOLDS_OFFICE",
   "MEMBER_OF_MINISTRY",
   "SUPPORTED_BY_DEPARTMENT",
   "IN_PORTFOLIO",

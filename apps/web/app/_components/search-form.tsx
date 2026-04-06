@@ -9,7 +9,7 @@ type SearchFormProps = {
 export function SearchForm({
   defaultValue = "",
   action = "/",
-  placeholder = "Search ministers, portfolios, and departments",
+  placeholder = "Search ministers, offices, and departments",
 }: SearchFormProps) {
   return (
     <form action={action} className="flex flex-col gap-3 sm:flex-row">

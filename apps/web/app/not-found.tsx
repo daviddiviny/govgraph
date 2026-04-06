@@ -14,7 +14,7 @@ export default function NotFound() {
         </h1>
         <p className="mt-4 text-base leading-7 text-[var(--govgraph-muted)]">
           The sprint 1 prototype only includes the current ministry, current
-          portfolio mapping, and department-backed portfolio relationships.
+          office mapping, and department-backed office relationships.
         </p>
         <div className="mt-8">
           <Link

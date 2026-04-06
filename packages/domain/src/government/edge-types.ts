@@ -1,5 +1,5 @@
 export const edgeTypes = [
-  "HOLDS_PORTFOLIO",
+  "HOLDS_OFFICE",
   "MEMBER_OF_MINISTRY",
   "SUPPORTED_BY_DEPARTMENT",
   "IN_PORTFOLIO",

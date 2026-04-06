@@ -41,13 +41,13 @@ export function parseVpscPortfolios(html: string): VpscPortfolioDataset {
   content.find("h2").each((_, element) => {
     const portfolioGroupName = $(element).text().trim();
     let cursor = $(element).next();
-    let portfolioTitles: string[] = [];
+    let officeTitles: string[] = [];
     let departmentDescription = "";
 
     while (cursor.length > 0 && cursor[0]?.tagName !== "h2") {
       if (cursor.is("h3") && /Ministers/i.test(cursor.text())) {
         const list = cursor.next("ul");
-        portfolioTitles = list
+        officeTitles = list
           .find("li")
           .map((__, item) => $(item).text().trim())
           .get()
@@ -69,7 +69,7 @@ export function parseVpscPortfolios(html: string): VpscPortfolioDataset {
         departmentDescription,
       ),
       departmentDescription,
-      portfolioTitles,
+      officeTitles,
     });
   });
 

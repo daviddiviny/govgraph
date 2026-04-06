@@ -59,7 +59,7 @@ function createCounts(nodes: GovernmentNode[]) {
   const counts = {
     person: 0,
     ministry: 0,
-    portfolio: 0,
+    ministerial_office: 0,
     department: 0,
     administrative_office: 0,
     public_entity: 0,
@@ -207,12 +207,12 @@ function describeEmployer(employer: VpscEmployerInput): string {
   return parts.filter((value): value is string => value !== undefined).join(" ");
 }
 
-function buildPortfolioNodes(
+function buildOfficeNodes(
   sections: PortfolioSectionInput[],
   source: SourceDocument,
   nodeStore: Map<string, GovernmentNode>,
   edgeStore: Map<string, GovernmentEdge>,
-  departmentByPortfolioTitle: Map<string, GovernmentNode>,
+  departmentByOfficeTitle: Map<string, GovernmentNode>,
 ) {
   for (const section of sections) {
     const department = upsertNode(nodeStore, {
@@ -224,21 +224,21 @@ function buildPortfolioNodes(
       sourceDocumentIds: [source.id],
     });
 
-    for (const title of section.portfolioTitles) {
-      const portfolio = upsertNode(nodeStore, {
-        nodeType: "portfolio",
-        canonicalName: title,
-        description: `${title} is supported by ${section.departmentName}.`,
+    for (const officeTitle of section.officeTitles) {
+      const office = upsertNode(nodeStore, {
+        nodeType: "ministerial_office",
+        canonicalName: officeTitle,
+        description: `${officeTitle} is supported by ${section.departmentName}.`,
         status: "active",
         sourceConfidence: "high",
         sourceDocumentIds: [source.id],
       });
 
-      departmentByPortfolioTitle.set(normalizeForMatch(title), department);
+      departmentByOfficeTitle.set(normalizeForMatch(officeTitle), department);
 
       upsertEdge(edgeStore, {
         edgeType: "SUPPORTED_BY_DEPARTMENT",
-        fromNodeId: portfolio.id,
+        fromNodeId: office.id,
         toNodeId: department.id,
         validFrom: todayIsoDate(),
         status: "active",
@@ -253,7 +253,7 @@ function buildMinistryNodes(
   ministry: MinistryDataset,
   nodeStore: Map<string, GovernmentNode>,
   edgeStore: Map<string, GovernmentEdge>,
-  departmentByPortfolioTitle: Map<string, GovernmentNode>,
+  departmentByOfficeTitle: Map<string, GovernmentNode>,
 ) {
   const ministryNode = upsertNode(nodeStore, {
     nodeType: "ministry",
@@ -286,26 +286,28 @@ function buildMinistryNodes(
 
     const responsibleDepartments = new Set<string>();
 
-    for (const title of member.titles) {
-      const portfolio = upsertNode(nodeStore, {
-        nodeType: "portfolio",
-        canonicalName: title,
-        description: "Current ministerial portfolio.",
+    for (const officeTitle of member.officeTitles) {
+      const office = upsertNode(nodeStore, {
+        nodeType: "ministerial_office",
+        canonicalName: officeTitle,
+        description: "Current ministerial office.",
         status: "active",
         sourceConfidence: "high",
         sourceDocumentIds: [ministry.source.id],
       });
 
       upsertEdge(edgeStore, {
-        edgeType: "HOLDS_PORTFOLIO",
+        edgeType: "HOLDS_OFFICE",
         fromNodeId: person.id,
-        toNodeId: portfolio.id,
+        toNodeId: office.id,
         validFrom: todayIsoDate(),
         status: "active",
         sourceDocumentIds: [ministry.source.id],
       });
 
-      const department = departmentByPortfolioTitle.get(normalizeForMatch(title));
+      const department = departmentByOfficeTitle.get(
+        normalizeForMatch(officeTitle),
+      );
       if (department) {
         responsibleDepartments.add(department.id);
       }
@@ -512,20 +514,20 @@ export function buildGovernmentCatalog(input: {
 }): GovernmentCatalog {
   const nodeStore = new Map<string, GovernmentNode>();
   const edgeStore = new Map<string, GovernmentEdge>();
-  const departmentByPortfolioTitle = new Map<string, GovernmentNode>();
+  const departmentByOfficeTitle = new Map<string, GovernmentNode>();
 
-  buildPortfolioNodes(
+  buildOfficeNodes(
     input.portfolios.sections,
     input.portfolios.source,
     nodeStore,
     edgeStore,
-    departmentByPortfolioTitle,
+    departmentByOfficeTitle,
   );
   buildMinistryNodes(
     input.ministry,
     nodeStore,
     edgeStore,
-    departmentByPortfolioTitle,
+    departmentByOfficeTitle,
   );
 
   if (input.employers) {

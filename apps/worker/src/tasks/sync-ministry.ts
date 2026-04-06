@@ -9,8 +9,8 @@ export const syncMinistry = task({
 
     return {
       members: snapshot.members.length,
-      portfolioAssignments: snapshot.members.reduce(
-        (total, member) => total + member.titles.length,
+      officeAssignments: snapshot.members.reduce(
+        (total, member) => total + member.officeTitles.length,
         0,
       ),
     };

@@ -24,7 +24,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     ...catalog.nodes.filter((node) => node.nodeType === "budget_document").slice(0, 2),
     ...catalog.nodes.filter((node) => node.nodeType === "public_entity").slice(0, 2),
     ...catalog.nodes.filter((node) => node.nodeType === "department").slice(0, 2),
-    ...catalog.nodes.filter((node) => node.nodeType === "person").slice(0, 2),
+    ...catalog.nodes.filter((node) => node.nodeType === "ministerial_office").slice(0, 1),
+    ...catalog.nodes.filter((node) => node.nodeType === "person").slice(0, 1),
   ].slice(0, 8);
   const implementedConnectors = sourceRegistry.filter(
     (entry) => entry.implementationStatus === "implemented",
@@ -46,10 +47,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 Victorian Government Map
               </p>
               <h1 className="max-w-4xl text-5xl font-semibold tracking-tight text-[var(--govgraph-ink)] sm:text-6xl">
-                Search the Victorian Government across structure, entities, and budget papers.
+                Search the Victorian Government across offices, entities, and budget papers.
               </h1>
               <p className="max-w-3xl text-base leading-8 text-[var(--govgraph-muted)] sm:text-lg">
-                The graph now combines the current ministry and portfolio map
+                The graph now combines the current ministry and office map
                 with the VPSC employers directory and the Victorian Budget paper
                 index, plus structured budget outputs and performance measures,
                 so public entities and budget records sit beside the core
@@ -68,7 +69,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 {catalog.summary.totalNodes}
               </p>
               <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
-                records across ministers, departments, public entities, outputs,
+                records across ministers, offices, departments, public entities, outputs,
                 measures, and budget documents.
               </p>
             </Card>

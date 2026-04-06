@@ -21,7 +21,7 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "GovGraph",
   description:
-    "An official-source-first map of Victoria's current ministers, portfolios, and supporting departments.",
+    "An official-source-first map of Victoria's current ministers, offices, and supporting departments.",
 };
 
 export default function RootLayout({

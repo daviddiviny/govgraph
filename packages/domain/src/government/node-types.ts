@@ -1,7 +1,7 @@
 export const nodeTypes = [
   "person",
   "ministry",
-  "portfolio",
+  "ministerial_office",
   "department",
   "administrative_office",
   "public_entity",
