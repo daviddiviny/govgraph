@@ -1,0 +1,15 @@
+{
+  "name": "@govgraph/worker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "dev": "tsx watch src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@govgraph/parsers": "workspace:*",
+    "@trigger.dev/sdk": "^4.0.0"
+  }
+}

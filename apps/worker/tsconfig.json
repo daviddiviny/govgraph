@@ -1,0 +1,4 @@
+{
+  "extends": "../../packages/config/ts/node.json",
+  "include": ["src/**/*.ts", "trigger.config.ts"]
+}
