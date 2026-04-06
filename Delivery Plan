@@ -1,0 +1,33 @@
+## Delivery plan
+
+### Sprint 1
+
+* repo scaffold
+* core schema
+* source registry
+* search prototype
+* VPSC portfolios connector
+* ministry connector
+* basic node pages
+
+### Sprint 2
+
+* VPSC employers connector
+* budget index connector
+* DataVic dataset connector
+* BP3 parser
+* department budget pages
+
+### Sprint 3
+
+* DPS parser
+* workforce datasets
+* graph view
+* citations and source cards
+
+### Sprint 4
+
+* AAO parser
+* timeline mode
+* as-of-date graph rendering
+* discrepancy/review queue

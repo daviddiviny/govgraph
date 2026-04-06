@@ -1,0 +1,18 @@
+export const edgeTypes = [
+  "HOLDS_PORTFOLIO",
+  "MEMBER_OF_MINISTRY",
+  "SUPPORTED_BY_DEPARTMENT",
+  "IN_PORTFOLIO",
+  "REPORTS_TO",
+  "RESPONSIBLE_FOR",
+  "DELIVERS_OUTPUT",
+  "HAS_PERFORMANCE_MEASURE",
+  "HAS_CAPITAL_PROJECT",
+  "FUNDED_BY",
+  "SUCCEEDED_BY",
+  "RENAMED_TO",
+  "MOVED_TO_PORTFOLIO",
+  "HAS_SOURCE",
+] as const;
+
+export type EdgeType = (typeof edgeTypes)[number];
