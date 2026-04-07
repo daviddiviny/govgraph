@@ -16,7 +16,7 @@ import {
 } from "./kanon";
 import {
   extractProvisionReferencesFromText,
-  normalizeGeneralOrderText,
+  normalizeGeneralOrderText as normalizeText,
 } from "./shared";
 
 export const VIC_GOV_GENERAL_ORDER_URL =
@@ -39,10 +39,6 @@ type AdministrationDetails = {
   parseStatus: ParseStatus;
   unparsedTail?: string;
 };
-
-function normalizeText(value: string): string {
-  return normalizeGeneralOrderText(value);
-}
 
 function stripOuterParentheses(value: string): string {
   const trimmed = value.trim();
@@ -138,6 +134,8 @@ function normalizeOfficeName(value: string): string {
 
 function extractOfficeNames(value: string): string[] {
   const normalized = normalizeText(value);
+  // TODO: extend this pattern if future sources introduce office titles such as
+  // Deputy Premier or Minister without Portfolio in these administration notes.
   const officeStartPattern =
     /\b(?:the\s+)?(?:Attorney-General|Premier|Treasurer|Minister for\b)/gi;
   const starts = Array.from(normalized.matchAll(officeStartPattern))

@@ -27,6 +27,7 @@ export type GeneralOrderKanonClient = {
 export type AssistGeneralOrderWithKanonOptions = {
   client?: GeneralOrderKanonClient;
   apiKey?: string;
+  // Isaacus enrichment requests accept at most 8 texts per call.
   batchSize?: number;
   overflowStrategy?: NonNullable<EnrichmentCreateParams["overflow_strategy"]>;
 };

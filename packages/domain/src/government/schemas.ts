@@ -188,14 +188,6 @@ export const kanonExternalDocumentTypeSchema = z.enum([
   "other",
 ]);
 
-export const kanonExternalDocumentTypeSchema = z.enum([
-  "statute",
-  "regulation",
-  "decision",
-  "contract",
-  "other",
-]);
-
 export const provisionReferenceSchema = z.object({
   rawText: z.string(),
   unit: z.enum([

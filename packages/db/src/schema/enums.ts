@@ -117,5 +117,4 @@ export const generalOrderRuleKindEnum = pgEnum("general_order_rule_kind", [
 export const generalOrderParseStatusEnum = pgEnum("general_order_parse_status", [
   "parsed",
   "partial",
-  "review",
 ]);
