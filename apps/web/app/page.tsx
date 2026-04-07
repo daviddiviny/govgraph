@@ -1,10 +1,13 @@
+import type { Route } from "next";
 import Link from "next/link";
 
 import { searchGovernmentCatalog } from "@govgraph/domain";
+import type { GeneralOrderSearchResult } from "@govgraph/db";
 import { loadGovernmentCatalog, sourceRegistry } from "@govgraph/parsers";
 import { Badge, Card } from "@govgraph/ui";
 
 import { SearchForm } from "./_components/search-form";
+import { loadGeneralOrderSearch } from "./general-order/_lib/data";
 import {
   firstQueryValue,
   humanizeNodeType,
@@ -15,11 +18,114 @@ type HomePageProps = {
   searchParams: Promise<{ q?: string | string[] | undefined }>;
 };
 
+function SearchSectionHeading({
+  eyebrow,
+  title,
+}: {
+  eyebrow: string;
+  title: string;
+}) {
+  return (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--govgraph-muted)]">
+        {eyebrow}
+      </p>
+      <h3 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--govgraph-ink)]">
+        {title}
+      </h3>
+    </div>
+  );
+}
+
+function EmptySearchState({ body }: { body: string }) {
+  return (
+    <Card className="p-6">
+      <h3 className="text-2xl font-semibold tracking-tight text-[var(--govgraph-ink)]">
+        No matches yet
+      </h3>
+      <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--govgraph-muted)]">
+        {body}
+      </p>
+    </Card>
+  );
+}
+
+function GeneralOrderSearchCard({
+  result,
+}: {
+  result: GeneralOrderSearchResult;
+}) {
+  if (result.kind === "office") {
+    return (
+      <Card className="p-5 transition-transform duration-200 hover:-translate-y-0.5">
+        <div className="flex flex-wrap gap-3">
+          <Badge>General Order office</Badge>
+          <Badge>{result.actEntryCount} Acts</Badge>
+          <Badge>{result.ruleCount} rules</Badge>
+          {result.sharedRuleCount > 0 ? (
+            <Badge>{result.sharedRuleCount} shared</Badge>
+          ) : null}
+          {result.partialRuleCount > 0 ? (
+            <Badge>{result.partialRuleCount} partial</Badge>
+          ) : null}
+        </div>
+        <Link
+          href={`/general-order/${result.officeSlug}` as Route}
+          className="mt-4 block text-2xl font-semibold tracking-tight text-[var(--govgraph-ink)] underline-offset-4 hover:underline"
+        >
+          {result.officeName}
+        </Link>
+        <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
+          Browse the Acts and carve-outs recorded for this office in the latest
+          imported General Order.
+        </p>
+        <p className="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
+          Match: {result.matchReason}
+        </p>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="p-5 transition-transform duration-200 hover:-translate-y-0.5">
+      <div className="flex flex-wrap gap-3">
+        <Badge>General Order Act</Badge>
+        <Badge>{result.ruleCount} rules</Badge>
+        {result.sharedRuleCount > 0 ? <Badge>{result.sharedRuleCount} shared</Badge> : null}
+        {result.partialRuleCount > 0 ? (
+          <Badge>{result.partialRuleCount} partial</Badge>
+        ) : null}
+      </div>
+      <Link
+        href={`/general-order/${result.officeSlug}` as Route}
+        className="mt-4 block text-2xl font-semibold tracking-tight text-[var(--govgraph-ink)] underline-offset-4 hover:underline"
+      >
+        {result.actName}
+      </Link>
+      <p className="mt-2 text-sm font-medium leading-6 text-[var(--govgraph-muted)]">
+        Under {result.officeName}
+      </p>
+      <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
+        {result.previewText}
+      </p>
+      <p className="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
+        Match: {result.matchReason}
+      </p>
+    </Card>
+  );
+}
+
 export default async function HomePage({ searchParams }: HomePageProps) {
   const { q } = await searchParams;
   const query = firstQueryValue(q)?.trim();
-  const catalog = await loadGovernmentCatalog();
+  const [catalog, generalOrderSearch] = await Promise.all([
+    loadGovernmentCatalog(),
+    query ? loadGeneralOrderSearch(query) : Promise.resolve({ status: "empty" as const }),
+  ]);
   const results = query ? searchGovernmentCatalog(catalog, query, 12) : [];
+  const generalOrderResults =
+    generalOrderSearch.status === "ready" ? generalOrderSearch.results : [];
+  const totalSearchMatches = results.length + generalOrderResults.length;
   const featuredNodes = [
     ...catalog.nodes.filter((node) => node.nodeType === "budget_document").slice(0, 2),
     ...catalog.nodes.filter((node) => node.nodeType === "public_entity").slice(0, 2),
@@ -58,6 +164,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </p>
             </div>
             <SearchForm {...(query ? { defaultValue: query } : {})} />
+            <div className="flex flex-wrap gap-4 text-sm font-medium text-[var(--govgraph-muted)]">
+              <Link
+                href={"/general-order" as Route}
+                className="underline-offset-4 hover:text-[var(--govgraph-accent)] hover:underline"
+              >
+                Browse General Order Act allocations
+              </Link>
+            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
@@ -123,14 +237,101 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </div>
             {query ? (
               <p className="text-sm text-[var(--govgraph-muted)]">
-                {results.length} matches
+                {totalSearchMatches} matches
               </p>
             ) : null}
           </div>
 
           <div className="grid gap-4">
-            {(query ? results.map((result) => result.node) : featuredNodes).map(
-              (node) => (
+            {query ? (
+              <>
+                {results.length > 0 ? (
+                  <>
+                    <SearchSectionHeading
+                      eyebrow="Atlas results"
+                      title="Current graph records"
+                    />
+                    {results.map((result) => {
+                      const node = result.node;
+
+                      return (
+                        <Card
+                          key={node.id}
+                          className="p-5 transition-transform duration-200 hover:-translate-y-0.5"
+                        >
+                          <div className="flex flex-wrap gap-3">
+                            <Badge>{humanizeNodeType(node.nodeType)}</Badge>
+                          </div>
+                          <Link
+                            href={`/nodes/${node.slug}`}
+                            className="mt-4 block text-2xl font-semibold tracking-tight text-[var(--govgraph-ink)] underline-offset-4 hover:underline"
+                          >
+                            {node.canonicalName}
+                          </Link>
+                          <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
+                            {node.description ??
+                              "Current record in the live government graph snapshot."}
+                          </p>
+                        </Card>
+                      );
+                    })}
+                  </>
+                ) : null}
+
+                {generalOrderSearch.status === "ready" &&
+                generalOrderResults.length > 0 ? (
+                  <>
+                    <SearchSectionHeading
+                      eyebrow="General Order"
+                      title="Act allocations and offices"
+                    />
+                    {generalOrderResults.map((result) => (
+                      <GeneralOrderSearchCard
+                        key={
+                          result.kind === "office"
+                            ? `office-${result.officeSlug}`
+                            : `act-${result.officeSlug}-${result.actName}-${result.headingText}`
+                        }
+                        result={result}
+                      />
+                    ))}
+                  </>
+                ) : null}
+
+                {generalOrderSearch.status === "empty" ? (
+                  <Card className="p-5">
+                    <h3 className="text-xl font-semibold text-[var(--govgraph-ink)]">
+                      General Order records are not loaded yet
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
+                      The main atlas search is working, but Act allocation matches
+                      will only appear after the General Order import has been
+                      loaded into Postgres.
+                    </p>
+                  </Card>
+                ) : null}
+
+                {generalOrderSearch.status === "error" ? (
+                  <Card className="p-5">
+                    <h3 className="text-xl font-semibold text-[var(--govgraph-ink)]">
+                      General Order search is unavailable right now
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
+                      The rest of the atlas search still works, but the app could
+                      not reach the imported General Order records. Error:{" "}
+                      {generalOrderSearch.message}
+                    </p>
+                  </Card>
+                ) : null}
+
+                {results.length === 0 &&
+                generalOrderResults.length === 0 &&
+                generalOrderSearch.status === "ready" ? (
+                  <EmptySearchState body="Try another office, Act title, or provision reference." />
+                ) : null}
+              </>
+            ) : (
+              featuredNodes.map((node) => (
                 <Card
                   key={node.id}
                   className="p-5 transition-transform duration-200 hover:-translate-y-0.5"
@@ -149,7 +350,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                       "Current record in the live government graph snapshot."}
                   </p>
                 </Card>
-              ),
+              ))
             )}
           </div>
         </div>

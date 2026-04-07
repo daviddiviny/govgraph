@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@govgraph/db": "workspace:*",
     "@govgraph/domain": "workspace:*",
     "@govgraph/parsers": "workspace:*",
     "@govgraph/ui": "workspace:*",

@@ -6,7 +6,7 @@ CREATE TYPE "public"."budget_phase" AS ENUM('budget', 'revised', 'actual');--> s
 CREATE TYPE "public"."change_event_type" AS ENUM('created', 'abolished', 'renamed', 'transferred', 'portfolio_changed');--> statement-breakpoint
 CREATE TYPE "public"."edge_type" AS ENUM('HOLDS_OFFICE', 'MEMBER_OF_MINISTRY', 'SUPPORTED_BY_DEPARTMENT', 'IN_PORTFOLIO', 'REPORTS_TO', 'RESPONSIBLE_FOR', 'DELIVERS_OUTPUT', 'HAS_PERFORMANCE_MEASURE', 'HAS_CAPITAL_PROJECT', 'FUNDED_BY', 'SUCCEEDED_BY', 'RENAMED_TO', 'MOVED_TO_PORTFOLIO', 'HAS_SOURCE');--> statement-breakpoint
 CREATE TYPE "public"."general_order_heading_style" AS ENUM('plain', 'except', 'scoped_list');--> statement-breakpoint
-CREATE TYPE "public"."general_order_parse_status" AS ENUM('parsed', 'partial', 'review');--> statement-breakpoint
+CREATE TYPE "public"."general_order_parse_status" AS ENUM('parsed', 'partial');--> statement-breakpoint
 CREATE TYPE "public"."general_order_rule_kind" AS ENUM('default', 'listed_scope', 'residual');--> statement-breakpoint
 CREATE TYPE "public"."node_type" AS ENUM('person', 'ministry', 'ministerial_office', 'department', 'administrative_office', 'public_entity', 'program_output', 'capital_project', 'performance_measure', 'budget_document', 'source_document', 'organisation_group');--> statement-breakpoint
 CREATE TYPE "public"."record_status" AS ENUM('active', 'ceased', 'superseded', 'draft');--> statement-breakpoint

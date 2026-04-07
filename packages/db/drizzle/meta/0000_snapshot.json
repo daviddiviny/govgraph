@@ -1375,8 +1375,7 @@
       "schema": "public",
       "values": [
         "parsed",
-        "partial",
-        "review"
+        "partial"
       ]
     },
     "public.general_order_rule_kind": {
