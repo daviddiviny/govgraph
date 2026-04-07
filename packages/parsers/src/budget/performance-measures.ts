@@ -91,6 +91,8 @@ function inferOwnerNodeType(
     return "organisation_group";
   }
 
+  // The current DataVic workbook set is departmental apart from the explicit
+  // exceptions above, so unknown owners are treated as departments for now.
   return "department";
 }
 

@@ -25,7 +25,14 @@ import {
   loadFixtureVpscPortfolios,
 } from "./vpsc/portfolios";
 
-let liveCatalogPromise: Promise<GovernmentCatalog> | undefined;
+const DEFAULT_CATALOG_CACHE_TTL_MS = 5 * 60 * 1000;
+
+type LiveCatalogCacheEntry = {
+  createdAtMs: number;
+  promise: Promise<GovernmentCatalog>;
+};
+
+let liveCatalogCache: LiveCatalogCacheEntry | undefined;
 
 type CatalogInputs = {
   portfolios: VpscPortfolioDataset;
@@ -58,6 +65,46 @@ async function safeLoad<T>(
   }
 }
 
+function getCatalogCacheTtlMs(): number {
+  const configuredTtlMs = Number(process.env.GOVGRAPH_CATALOG_CACHE_TTL_MS);
+
+  if (!Number.isFinite(configuredTtlMs)) {
+    return DEFAULT_CATALOG_CACHE_TTL_MS;
+  }
+
+  return Math.max(0, Math.floor(configuredTtlMs));
+}
+
+function createLiveFirstCatalogPromise(): Promise<GovernmentCatalog> {
+  return Promise.all([
+    safeLoad("VPSC portfolios", fetchVpscPortfolios, loadFixtureVpscPortfolios),
+    safeLoad(
+      "Parliament ministry",
+      fetchParliamentGovernmentMinistry,
+      loadFixtureParliamentGovernmentMinistry,
+    ),
+    safeLoad("VPSC employers", fetchVpscEmployers, loadFixtureVpscEmployers),
+    safeLoad("Budget index", fetchBudgetIndex, loadFixtureBudgetIndex),
+    safeLoad(
+      "Budget performance measures",
+      fetchBudgetPerformanceMeasures,
+      loadFixtureBudgetPerformanceMeasures,
+    ),
+  ]).then(([portfolios, ministry, employers, budgetIndex, performanceMeasures]) =>
+    buildGovernmentCatalog({
+      portfolios,
+      ministry,
+      employers,
+      budgetIndex,
+      performanceMeasures,
+    }),
+  );
+}
+
+export function resetCatalogCache(): void {
+  liveCatalogCache = undefined;
+}
+
 export async function loadGovernmentCatalog(
   mode: "live-first" | "live" | "fixture" = "live-first",
 ): Promise<GovernmentCatalog> {
@@ -81,32 +128,31 @@ export async function loadGovernmentCatalog(
     return loadLiveCatalog();
   }
 
-  if (!liveCatalogPromise) {
-    liveCatalogPromise = Promise.all([
-      safeLoad("VPSC portfolios", fetchVpscPortfolios, loadFixtureVpscPortfolios),
-      safeLoad(
-        "Parliament ministry",
-        fetchParliamentGovernmentMinistry,
-        loadFixtureParliamentGovernmentMinistry,
-      ),
-      safeLoad("VPSC employers", fetchVpscEmployers, loadFixtureVpscEmployers),
-      safeLoad("Budget index", fetchBudgetIndex, loadFixtureBudgetIndex),
-      safeLoad(
-        "Budget performance measures",
-        fetchBudgetPerformanceMeasures,
-        loadFixtureBudgetPerformanceMeasures,
-      ),
-    ]).then(
-      ([portfolios, ministry, employers, budgetIndex, performanceMeasures]) =>
-        buildGovernmentCatalog({
-          portfolios,
-          ministry,
-          employers,
-          budgetIndex,
-          performanceMeasures,
-        }),
-    );
+  const nowMs = Date.now();
+  const cacheTtlMs = getCatalogCacheTtlMs();
+  const cacheIsFresh =
+    liveCatalogCache !== undefined &&
+    nowMs - liveCatalogCache.createdAtMs < cacheTtlMs;
+
+  if (!cacheIsFresh) {
+    const promise = createLiveFirstCatalogPromise().catch((error) => {
+      if (liveCatalogCache?.promise === promise) {
+        liveCatalogCache = undefined;
+      }
+      throw error;
+    });
+
+    liveCatalogCache = {
+      createdAtMs: nowMs,
+      promise,
+    };
   }
 
-  return liveCatalogPromise;
+  const cachedCatalog = liveCatalogCache;
+
+  if (!cachedCatalog) {
+    throw new Error("Live catalog cache was not initialized.");
+  }
+
+  return cachedCatalog.promise;
 }

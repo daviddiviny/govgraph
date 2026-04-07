@@ -488,6 +488,8 @@ function buildBudgetPerformanceMeasureNodes(
           notes: measure.category,
           sourceDocumentIds,
         });
+        // Keep a direct owner-to-measure link so owner pages can list measures
+        // without needing a second hop through every output node.
         upsertEdge(edgeStore, {
           edgeType: "HAS_PERFORMANCE_MEASURE",
           fromNodeId: ownerNode.id,

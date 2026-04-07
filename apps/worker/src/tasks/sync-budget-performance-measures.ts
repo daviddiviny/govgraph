@@ -5,6 +5,8 @@ import { fetchBudgetPerformanceMeasures } from "@govgraph/parsers";
 export const syncBudgetPerformanceMeasures = task({
   id: "sync-budget-performance-measures",
   run: async () => {
+    // Sprint 2 keeps these jobs fetch-only so scheduled runs prove the source is
+    // still healthy and record the snapshot shape before persistence lands.
     const snapshot = await fetchBudgetPerformanceMeasures();
 
     return {
