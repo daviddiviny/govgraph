@@ -14,8 +14,9 @@ export default function NotFound() {
             This record isn&apos;t in the current snapshot.
           </h1>
           <p className="mt-[var(--gg-space-4)] text-[length:var(--gg-font-size-base)] leading-[var(--gg-font-line-height-body)] text-[var(--gg-color-semantic-text-secondary)]">
-            The sprint 1 prototype only includes the current ministry, current
-            portfolio mapping, and department-backed portfolio relationships.
+            The current snapshot covers the ministry, portfolio mapping,
+            departments, public entities, budget documents, and the VPSC
+            directory.
           </p>
           <div className="mt-[var(--gg-space-8)]">
             <Link

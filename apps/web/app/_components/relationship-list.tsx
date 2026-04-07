@@ -20,7 +20,7 @@ export function RelationshipList({ relatedNodes }: RelationshipListProps) {
   }
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-[var(--gg-space-4)]">
       {relatedNodes.map((entry) => (
         <NodeCard
           key={`${entry.edgeType}-${entry.direction}-${entry.node.id}`}

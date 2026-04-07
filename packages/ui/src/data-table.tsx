@@ -10,6 +10,10 @@ import {
   type DataTableRow,
   type DataTableSortState,
 } from "./data-table-sort";
+import {
+  getDataTableRowKeyLookup,
+  getDataTableRowSignature,
+} from "./data-table-row-key";
 import { cn } from "./utils";
 
 type DataTableProps<Row extends DataTableRow> = HTMLAttributes<HTMLDivElement> & {
@@ -44,6 +48,7 @@ export function DataTable<Row extends DataTableRow>({
 }: DataTableProps<Row>) {
   const [sortState, setSortState] = useState<DataTableSortState<Row>>(null);
   const sortedRows = sortRows(rows, sortState);
+  const rowKeyLookup = getDataTableRowKeyLookup(rows, columns);
 
   return (
     <div
@@ -115,9 +120,11 @@ export function DataTable<Row extends DataTableRow>({
               </td>
             </tr>
           ) : (
-            sortedRows.map((row, rowIndex) => (
+            sortedRows.map((row) => (
               <tr
-                key={rowIndex}
+                key={
+                  rowKeyLookup.get(row) ?? getDataTableRowSignature(row, columns)
+                }
                 className="border-t border-[var(--gg-color-border)] first:border-t-0"
               >
                 {columns.map((column) => (

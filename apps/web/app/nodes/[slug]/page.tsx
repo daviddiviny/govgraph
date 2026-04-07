@@ -17,7 +17,7 @@ import {
 
 import { RelationshipList } from "../../_components/relationship-list";
 import { SearchForm } from "../../_components/search-form";
-import { humanizeSourceFamily } from "../../_lib/presenters";
+import { humanizeNodeType, humanizeSourceFamily } from "../../_lib/presenters";
 
 type NodePageProps = {
   params: Promise<{ slug: string }>;
@@ -69,7 +69,7 @@ export default async function NodePage({ params }: NodePageProps) {
                 },
                 {
                   content: (
-                    <span>{profile.node.nodeType.replace(/_/g, " ")}</span>
+                    <span>{humanizeNodeType(profile.node.nodeType)}</span>
                   ),
                 },
                 {
@@ -117,7 +117,7 @@ export default async function NodePage({ params }: NodePageProps) {
               <dl className="mt-[var(--gg-space-4)]">
                 <KeyValue
                   label="Node type"
-                  value={profile.node.nodeType.replace(/_/g, " ")}
+                  value={humanizeNodeType(profile.node.nodeType)}
                 />
                 <KeyValue
                   label="Connected records"
