@@ -64,8 +64,16 @@ export default async function NodePage({ params }: NodePageProps) {
             </h1>
             <p className="max-w-3xl text-base leading-7 text-[var(--govgraph-muted)] sm:text-lg">
               {profile.node.description ??
-                "This node is part of the sprint 1 government map prototype."}
+                "This node is part of the current government map snapshot."}
             </p>
+            {profile.node.websiteUrl ? (
+              <a
+                href={profile.node.websiteUrl}
+                className="inline-flex text-sm font-medium text-[var(--govgraph-accent)] underline-offset-4 hover:underline"
+              >
+                Open official page
+              </a>
+            ) : null}
           </div>
         </div>
 

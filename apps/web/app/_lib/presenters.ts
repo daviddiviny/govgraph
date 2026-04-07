@@ -26,8 +26,16 @@ export function describeRelationship(entry: RelatedNode): string {
       return entry.direction === "outgoing" ? "Member of" : "Includes";
     case "SUPPORTED_BY_DEPARTMENT":
       return entry.direction === "outgoing" ? "Supported by" : "Supports";
+    case "IN_PORTFOLIO":
+      return entry.direction === "outgoing" ? "In portfolio of" : "Portfolio includes";
     case "RESPONSIBLE_FOR":
       return entry.direction === "outgoing" ? "Responsible for" : "Responsibility held by";
+    case "DELIVERS_OUTPUT":
+      return entry.direction === "outgoing" ? "Delivers output" : "Delivered by";
+    case "HAS_PERFORMANCE_MEASURE":
+      return entry.direction === "outgoing"
+        ? "Has performance measure"
+        : "Measures";
     default:
       return entry.edgeType.toLowerCase().replace(/_/g, " ");
   }

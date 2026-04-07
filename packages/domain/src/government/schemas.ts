@@ -11,7 +11,14 @@ export const sourceFamilySchema = z.enum([
   "parliament",
 ]);
 
-export const sourceTypeSchema = z.enum(["html", "pdf", "xlsx", "csv", "api"]);
+export const sourceTypeSchema = z.enum([
+  "html",
+  "pdf",
+  "docx",
+  "xlsx",
+  "csv",
+  "api",
+]);
 
 export const sourceDocumentSchema = z.object({
   id: z.string().uuid(),
@@ -91,4 +98,69 @@ export type MinistryMemberInput = {
 export type MinistryDataset = {
   source: SourceDocument;
   members: MinistryMemberInput[];
+};
+
+export type VpscEmployerInput = {
+  employerName: string;
+  employerType: string;
+  publicSectorBodyType: string;
+  industry: string;
+  subSector: string;
+  portfolioDepartment: string;
+  virtDetermination: string;
+  executivePolicy: string;
+};
+
+export type VpscEmployersDataset = {
+  source: SourceDocument;
+  asOfDate?: string;
+  employers: VpscEmployerInput[];
+};
+
+export type BudgetIndexEntryInput = {
+  title: string;
+  summary?: string;
+  landingUrl: string;
+  aliases?: string[];
+  sourceDocuments: SourceDocument[];
+};
+
+export type BudgetIndexDataset = {
+  source: SourceDocument;
+  budgetYear?: string;
+  entries: BudgetIndexEntryInput[];
+};
+
+export type BudgetPerformanceMeasureSeriesEntryInput = {
+  label: string;
+  value: string;
+};
+
+export type BudgetPerformanceMeasureInput = {
+  category: string;
+  measureName: string;
+  unitOfMeasure?: string;
+  note?: string;
+  series: BudgetPerformanceMeasureSeriesEntryInput[];
+};
+
+export type BudgetProgramOutputInput = {
+  outputName: string;
+  measures: BudgetPerformanceMeasureInput[];
+};
+
+export type BudgetPerformanceMeasureOwnerInput = {
+  ownerName: string;
+  ownerNodeType: Extract<
+    GovernmentNode["nodeType"],
+    "department" | "public_entity" | "administrative_office" | "organisation_group"
+  >;
+  source: SourceDocument;
+  outputs: BudgetProgramOutputInput[];
+};
+
+export type BudgetPerformanceMeasuresDataset = {
+  source: SourceDocument;
+  budgetYear?: string;
+  owners: BudgetPerformanceMeasureOwnerInput[];
 };

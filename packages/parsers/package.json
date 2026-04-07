@@ -15,6 +15,9 @@
   "dependencies": {
     "@govgraph/domain": "workspace:*",
     "cheerio": "^1.1.2",
+    "fast-xml-parser": "^5.5.10",
+    "jszip": "^3.10.1",
+    "xlsx": "^0.18.5",
     "zod": "^4.1.12"
   }
 }
