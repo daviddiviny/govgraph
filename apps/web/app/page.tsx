@@ -2,14 +2,19 @@ import Link from "next/link";
 
 import { searchGovernmentCatalog } from "@govgraph/domain";
 import { loadGovernmentCatalog, sourceRegistry } from "@govgraph/parsers";
-import { Badge, Card } from "@govgraph/ui";
+import {
+  Badge,
+  EmptyState,
+  NodeCard,
+  NodeTypeBadge,
+  PageShell,
+  SectionHeader,
+  SourceCard,
+  StatCard,
+} from "@govgraph/ui";
 
 import { SearchForm } from "./_components/search-form";
-import {
-  firstQueryValue,
-  humanizeNodeType,
-  humanizeSourceFamily,
-} from "./_lib/presenters";
+import { firstQueryValue, humanizeSourceFamily } from "./_lib/presenters";
 
 type HomePageProps = {
   searchParams: Promise<{ q?: string | string[] | undefined }>;
@@ -31,158 +36,132 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   );
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-8 sm:px-8 lg:px-10 lg:py-12">
-      <section className="relative overflow-hidden rounded-[2.5rem] border border-[var(--govgraph-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(250,245,235,0.92))] p-6 shadow-[0_30px_90px_rgba(14,44,36,0.09)] backdrop-blur-sm sm:p-8 lg:p-10">
-        <div className="absolute -right-16 top-0 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(185,74,55,0.22),rgba(185,74,55,0))]" />
-        <div className="absolute -left-8 bottom-0 h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(32,96,79,0.18),rgba(32,96,79,0))]" />
-        <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="space-y-6">
-            <div className="flex flex-wrap gap-3">
-              <Badge>Official source first</Badge>
-              <Badge>Sprint 2 underway</Badge>
-            </div>
-            <div className="space-y-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--govgraph-muted)]">
-                Victorian Government Map
-              </p>
-              <h1 className="max-w-4xl text-5xl font-semibold tracking-tight text-[var(--govgraph-ink)] sm:text-6xl">
-                Search the Victorian Government across structure, entities, and budget papers.
-              </h1>
-              <p className="max-w-3xl text-base leading-8 text-[var(--govgraph-muted)] sm:text-lg">
-                The graph now combines the current ministry and portfolio map
-                with the VPSC employers directory and the Victorian Budget paper
-                index, plus structured budget outputs and performance measures,
-                so public entities and budget records sit beside the core
-                government structure.
-              </p>
-            </div>
-            <SearchForm {...(query ? { defaultValue: query } : {})} />
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-            <Card className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
-                Live snapshot
-              </p>
-              <p className="mt-4 text-4xl font-semibold text-[var(--govgraph-ink)]">
-                {catalog.summary.totalNodes}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
-                records across ministers, departments, public entities, outputs,
-                measures, and budget documents.
-              </p>
-            </Card>
-            <Card className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
-                Connectors
-              </p>
-              <p className="mt-4 text-4xl font-semibold text-[var(--govgraph-ink)]">
-                {implementedConnectors.length}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
-                live parsers feeding the search and node pages right now.
-              </p>
-            </Card>
-            <Card className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
-                Public entities
-              </p>
-              <p className="mt-4 text-4xl font-semibold text-[var(--govgraph-ink)]">
-                {catalog.summary.countsByType.public_entity}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
-                employer records pulled in from the live VPSC directory snapshot.
-              </p>
-            </Card>
-            <Card className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
-                Budget documents
-              </p>
-              <p className="mt-4 text-4xl font-semibold text-[var(--govgraph-ink)]">
-                {catalog.summary.countsByType.budget_document}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
-                indexed papers and budget tools now searchable from the same atlas.
-              </p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="space-y-4">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--govgraph-muted)]">
-                Search results
-              </p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[var(--govgraph-ink)]">
-                {query ? `Results for “${query}”` : "Featured records"}
-              </h2>
-            </div>
-            {query ? (
-              <p className="text-sm text-[var(--govgraph-muted)]">
-                {results.length} matches
-              </p>
-            ) : null}
-          </div>
-
-          <div className="grid gap-4">
-            {(query ? results.map((result) => result.node) : featuredNodes).map(
-              (node) => (
-                <Card
-                  key={node.id}
-                  className="p-5 transition-transform duration-200 hover:-translate-y-0.5"
-                >
-                  <div className="flex flex-wrap gap-3">
-                    <Badge>{humanizeNodeType(node.nodeType)}</Badge>
-                  </div>
-                  <Link
-                    href={`/nodes/${node.slug}`}
-                    className="mt-4 block text-2xl font-semibold tracking-tight text-[var(--govgraph-ink)] underline-offset-4 hover:underline"
-                  >
-                    {node.canonicalName}
-                  </Link>
-                  <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
-                    {node.description ??
-                      "Current record in the live government graph snapshot."}
-                  </p>
-                </Card>
-              ),
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--govgraph-muted)]">
-              Source registry
-            </p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[var(--govgraph-ink)]">
-              Current connectors
-            </h2>
-          </div>
-          <div className="grid gap-4">
-            {sourceRegistry.map((entry) => (
-              <Card key={entry.id} className="p-5">
-                <div className="flex flex-wrap gap-3">
-                  <Badge>{humanizeSourceFamily(entry.sourceFamily)}</Badge>
-                  <Badge>{entry.implementationStatus}</Badge>
-                </div>
-                <h3 className="mt-4 text-xl font-semibold text-[var(--govgraph-ink)]">
-                  {entry.name}
-                </h3>
-                <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
-                  {entry.description}
+    <main>
+      <PageShell className="gap-[var(--gg-space-10)]">
+        <section className="relative overflow-hidden rounded-[var(--gg-radius-2xl)] border border-[var(--gg-color-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(250,245,235,0.92))] p-[var(--gg-space-6)] shadow-[var(--gg-shadow-lg)] backdrop-blur-sm sm:p-[var(--gg-space-8)] lg:p-[var(--gg-space-10)]">
+          <div className="absolute -right-16 top-0 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(185,74,55,0.22),rgba(185,74,55,0))]" />
+          <div className="absolute -left-8 bottom-0 h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(32,96,79,0.18),rgba(32,96,79,0))]" />
+          <div className="relative grid gap-[var(--gg-space-8)] lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="space-y-[var(--gg-space-6)]">
+              <div className="flex flex-wrap gap-[var(--gg-space-3)]">
+                <Badge tone="accent">Official source first</Badge>
+                <Badge tone="success">Sprint 2 underway</Badge>
+              </div>
+              <div className="space-y-[var(--gg-space-4)]">
+                <p className="text-[length:var(--gg-font-size-xs)] font-semibold uppercase tracking-[var(--gg-font-letter-spacing-eyebrow)] text-[var(--gg-color-semantic-text-secondary)]">
+                  Victorian Government Map
                 </p>
-                <p className="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
-                  {entry.cadence}
+                <h1 className="max-w-4xl font-[family-name:var(--gg-font-family-display)] text-[length:var(--gg-font-size-5xl)] font-semibold tracking-[var(--gg-font-letter-spacing-tight)] text-[var(--gg-color-ink)] sm:text-[length:var(--gg-font-size-6xl)]">
+                  Search the Victorian Government across structure, entities,
+                  and budget papers.
+                </h1>
+                <p className="max-w-3xl text-[length:var(--gg-font-size-base)] leading-[var(--gg-font-line-height-relaxed)] text-[var(--gg-color-semantic-text-secondary)] sm:text-[length:var(--gg-font-size-lg)]">
+                  The graph now combines the current ministry and portfolio map
+                  with the VPSC employers directory and the Victorian Budget
+                  paper index, plus structured budget outputs and performance
+                  measures, so public entities and budget records sit beside
+                  the core government structure.
                 </p>
-              </Card>
-            ))}
+              </div>
+              <SearchForm
+                {...(query ? { defaultValue: query } : {})}
+                size="lg"
+              />
+            </div>
+
+            <div className="grid gap-[var(--gg-space-4)] sm:grid-cols-2 lg:grid-cols-2">
+              <StatCard
+                description="Records across ministers, departments, public entities, outputs, measures, and budget documents."
+                label="Live snapshot"
+                value={catalog.summary.totalNodes}
+              />
+              <StatCard
+                description="Live parsers feeding the search and node pages right now."
+                label="Connectors"
+                value={implementedConnectors.length}
+              />
+              <StatCard
+                description="Employer records pulled in from the live VPSC directory snapshot."
+                label="Public entities"
+                value={catalog.summary.countsByType.public_entity}
+              />
+              <StatCard
+                description="Indexed papers and budget tools now searchable from the same atlas."
+                label="Budget documents"
+                value={catalog.summary.countsByType.budget_document}
+              />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <section className="grid gap-[var(--gg-space-6)] lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="space-y-[var(--gg-space-4)]">
+            <SectionHeader
+              eyebrow="Search results"
+              title={query ? `Results for “${query}”` : "Featured records"}
+              trailing={
+                query ? `${results.length} ${results.length === 1 ? "match" : "matches"}` : undefined
+              }
+            />
+
+            <div className="grid gap-[var(--gg-space-4)]">
+              {query && results.length === 0 ? (
+                <EmptyState
+                  description="Try a minister title, a department name, a public entity name, or a budget paper keyword from the current Victorian Government data."
+                  title={`No live records match “${query}”`}
+                />
+              ) : (
+                (query ? results.map((result) => result.node) : featuredNodes).map(
+                  (node) => (
+                    <NodeCard
+                      key={node.id}
+                      badges={<NodeTypeBadge nodeType={node.nodeType} />}
+                      description={
+                        node.description ??
+                        "Current record in the live government graph snapshot."
+                      }
+                      title={
+                        <Link
+                          href={`/nodes/${node.slug}`}
+                          className="underline-offset-4 hover:underline"
+                        >
+                          {node.canonicalName}
+                        </Link>
+                      }
+                    />
+                  ),
+                )
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-[var(--gg-space-4)]">
+            <SectionHeader
+              eyebrow="Source registry"
+              title="Current connectors"
+              description="Every live parser feeding the atlas, shown with its source family, cadence, and current implementation status."
+            />
+            <div className="grid gap-[var(--gg-space-4)]">
+              {sourceRegistry.map((entry) => (
+                <SourceCard
+                  key={entry.id}
+                  badges={
+                    <>
+                      <Badge>{humanizeSourceFamily(entry.sourceFamily)}</Badge>
+                      <Badge tone={entry.implementationStatus === "implemented" ? "success" : "muted"}>
+                        {entry.implementationStatus}
+                      </Badge>
+                    </>
+                  }
+                  description={entry.description}
+                  metadata={entry.cadence}
+                  title={entry.name}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      </PageShell>
     </main>
   );
 }
