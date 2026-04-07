@@ -1,4 +1,7 @@
 {
   "extends": "../config/ts/node.json",
+  "compilerOptions": {
+    "types": ["node", "vitest/globals"]
+  },
   "include": ["src/**/*.ts", "drizzle.config.ts"]
 }

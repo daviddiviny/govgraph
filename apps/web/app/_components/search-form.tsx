@@ -10,7 +10,7 @@ type SearchFormProps = {
 export function SearchForm({
   defaultValue = "",
   action = "/",
-  placeholder = "Search ministers, portfolios, and departments",
+  placeholder = "Search ministers, offices, and departments",
   size = "lg",
 }: SearchFormProps) {
   return (

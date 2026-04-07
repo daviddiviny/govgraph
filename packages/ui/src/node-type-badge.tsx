@@ -8,8 +8,8 @@ const nodeTypeToneClasses = {
     "border-[var(--gg-color-node-person-border)] bg-[var(--gg-color-node-person-bg)] text-[var(--gg-color-node-person-text)]",
   ministry:
     "border-[var(--gg-color-node-ministry-border)] bg-[var(--gg-color-node-ministry-bg)] text-[var(--gg-color-node-ministry-text)]",
-  portfolio:
-    "border-[var(--gg-color-node-portfolio-border)] bg-[var(--gg-color-node-portfolio-bg)] text-[var(--gg-color-node-portfolio-text)]",
+  ministerial_office:
+    "border-[var(--gg-color-node-ministerial-office-border)] bg-[var(--gg-color-node-ministerial-office-bg)] text-[var(--gg-color-node-ministerial-office-text)]",
   department:
     "border-[var(--gg-color-node-department-border)] bg-[var(--gg-color-node-department-bg)] text-[var(--gg-color-node-department-text)]",
   administrative_office:
@@ -33,7 +33,9 @@ const nodeTypeToneClasses = {
 export type NodeTypeBadgeType = keyof typeof nodeTypeToneClasses;
 
 function humanizeNodeType(nodeType: NodeTypeBadgeType): string {
-  return nodeType.replace(/_/g, " ");
+  return nodeType === "ministerial_office"
+    ? "ministerial office"
+    : nodeType.replace(/_/g, " ");
 }
 
 export function getNodeTypeBadgeClasses(nodeType: NodeTypeBadgeType): string {

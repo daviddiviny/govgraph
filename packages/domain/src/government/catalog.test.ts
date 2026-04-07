@@ -33,7 +33,7 @@ const portfolios: VpscPortfolioDataset = {
       portfolioGroupName: "Education",
       departmentName: "Department of Education",
       departmentDescription: "Supports education in Victoria.",
-      portfolioTitles: ["Minister for Education", "Minister for Children"],
+      officeTitles: ["Minister for Education", "Minister for Children"],
     },
   ],
 };
@@ -50,7 +50,7 @@ const ministry: MinistryDataset = {
   members: [
     {
       personName: "Ben Carroll",
-      titles: ["Minister for Education", "Deputy Premier"],
+      officeTitles: ["Minister for Education", "Deputy Premier"],
     },
   ],
 };
@@ -171,7 +171,7 @@ const performanceMeasures: BudgetPerformanceMeasuresDataset = {
 };
 
 describe("buildGovernmentCatalog", () => {
-  it("creates departments, portfolios, people, employers, budget documents, and budget measures", () => {
+  it("creates departments, ministerial offices, people, employers, budget documents, and budget measures", () => {
     const catalog = buildGovernmentCatalog({
       portfolios,
       ministry,
@@ -184,9 +184,9 @@ describe("buildGovernmentCatalog", () => {
     expect(
       catalog.edges.some((edge) => edge.edgeType === "SUPPORTED_BY_DEPARTMENT"),
     ).toBe(true);
-    expect(
-      catalog.edges.some((edge) => edge.edgeType === "HOLDS_PORTFOLIO"),
-    ).toBe(true);
+    expect(catalog.edges.some((edge) => edge.edgeType === "HOLDS_OFFICE")).toBe(
+      true,
+    );
     expect(
       catalog.edges.some((edge) => edge.edgeType === "IN_PORTFOLIO"),
     ).toBe(true);
@@ -244,7 +244,7 @@ describe("buildGovernmentCatalog", () => {
 
     const profile = getNodeProfile(catalog, benCarroll.slug);
     expect(
-      profile?.relatedNodes.some((entry) => entry.edgeType === "HOLDS_PORTFOLIO"),
+      profile?.relatedNodes.some((entry) => entry.edgeType === "HOLDS_OFFICE"),
     ).toBe(true);
 
     const education = catalog.nodes.find(

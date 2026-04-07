@@ -26,7 +26,7 @@ export function parseParliamentGovernmentMinistry(html: string): MinistryDataset
         .text()
         .replace(/\s+/g, " ")
         .trim();
-      const titles = $(element)
+      const officeTitles = $(element)
         .find("table p")
         .map((__, title) => $(title).text().replace(/\s+/g, " ").trim())
         .get()
@@ -40,7 +40,7 @@ export function parseParliamentGovernmentMinistry(html: string): MinistryDataset
 
       return {
         personName,
-        titles,
+        officeTitles,
         ...(href ? { detailUrl: absolutize(href) } : {}),
       };
     })

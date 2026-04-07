@@ -9,9 +9,15 @@
   "types": "./src/index.ts",
   "scripts": {
     "build": "tsc --noEmit",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
-    "drizzle-orm": "^0.44.6"
+    "@govgraph/domain": "workspace:*",
+    "drizzle-orm": "^0.44.6",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.20.0"
   }
 }

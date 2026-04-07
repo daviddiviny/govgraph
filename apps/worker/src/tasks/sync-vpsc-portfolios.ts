@@ -10,8 +10,8 @@ export const syncVpscPortfolios = task({
     return {
       effectiveDate: snapshot.asOfDate,
       departments: snapshot.sections.length,
-      portfolios: snapshot.sections.reduce(
-        (total, section) => total + section.portfolioTitles.length,
+      ministerialOffices: snapshot.sections.reduce(
+        (total, section) => total + section.officeTitles.length,
         0,
       ),
     };

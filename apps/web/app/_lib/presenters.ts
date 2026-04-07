@@ -20,8 +20,8 @@ export function humanizeSourceFamily(sourceFamily: string): string {
 
 export function describeRelationship(entry: RelatedNode): string {
   switch (entry.edgeType) {
-    case "HOLDS_PORTFOLIO":
-      return entry.direction === "outgoing" ? "Holds portfolio" : "Held by";
+    case "HOLDS_OFFICE":
+      return entry.direction === "outgoing" ? "Holds office" : "Held by";
     case "MEMBER_OF_MINISTRY":
       return entry.direction === "outgoing" ? "Member of" : "Includes";
     case "SUPPORTED_BY_DEPARTMENT":

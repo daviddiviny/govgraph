@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@govgraph/db": "workspace:*",
     "@govgraph/parsers": "workspace:*",
     "@trigger.dev/sdk": "^4.0.0"
   }

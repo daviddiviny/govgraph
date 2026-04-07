@@ -33,7 +33,7 @@ export const colors = {
       border: "#d9cdb9",
       text: "#4b3d22",
     },
-    portfolio: {
+    ministerial_office: {
       bg: "#f4e4dd",
       border: "#debaa9",
       text: "#6f3b2f",

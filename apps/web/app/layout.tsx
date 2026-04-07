@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Route } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from "next/font/google";
 import Link from "next/link";
 import { Badge, Footer, SiteHeader } from "@govgraph/ui";
@@ -24,7 +24,7 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "GovGraph",
   description:
-    "An official-source-first map of Victoria's current ministers, portfolios, and supporting departments.",
+    "An official-source-first map of Victoria's current ministers, offices, and supporting departments.",
 };
 
 export default function RootLayout({
@@ -57,7 +57,7 @@ export default function RootLayout({
                 <Link href="/" className="underline-offset-4 hover:text-[var(--gg-color-deep)] hover:underline">
                   Atlas
                 </Link>
-                <Link href="/design" className="underline-offset-4 hover:text-[var(--gg-color-deep)] hover:underline">
+                <Link href={"/design" as Route} className="underline-offset-4 hover:text-[var(--gg-color-deep)] hover:underline">
                   Design
                 </Link>
               </>
@@ -71,7 +71,7 @@ export default function RootLayout({
                 <Link href="/" className="underline-offset-4 hover:text-[var(--gg-color-deep)] hover:underline">
                   Home
                 </Link>
-                <Link href="/design" className="underline-offset-4 hover:text-[var(--gg-color-deep)] hover:underline">
+                <Link href={"/design" as Route} className="underline-offset-4 hover:text-[var(--gg-color-deep)] hover:underline">
                   Design System
                 </Link>
                 <a

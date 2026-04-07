@@ -35,7 +35,7 @@ export const sourceRegistry: SourceRegistryEntry[] = [
     id: "vpsc-portfolios",
     name: "VPSC portfolios",
     description:
-      "Maps current ministerial portfolios to their supporting departments.",
+      "Maps current ministerial offices to their supporting departments.",
     cadence: "weekly",
     sourceFamily: "vpsc",
     urls: [
@@ -58,7 +58,7 @@ export const sourceRegistry: SourceRegistryEntry[] = [
   {
     id: "ministry-parliament",
     name: "Parliament government ministry",
-    description: "Lists current ministers and the portfolios they hold.",
+    description: "Lists current ministers and the offices they hold.",
     cadence: "daily",
     sourceFamily: "parliament",
     urls: ["https://www.parliament.vic.gov.au/portfolios/"],

@@ -14,9 +14,10 @@ export default function NotFound() {
             This record isn&apos;t in the current snapshot.
           </h1>
           <p className="mt-[var(--gg-space-4)] text-[length:var(--gg-font-size-base)] leading-[var(--gg-font-line-height-body)] text-[var(--gg-color-semantic-text-secondary)]">
-            The current snapshot covers the ministry, portfolio mapping,
+            The current snapshot covers the ministry, office mapping,
             departments, public entities, budget documents, and the VPSC
-            directory.
+            directory, plus the imported General Order browser when that data
+            has been loaded.
           </p>
           <div className="mt-[var(--gg-space-8)]">
             <Link

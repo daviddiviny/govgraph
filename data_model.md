@@ -8,7 +8,7 @@ The key design decision is to separate **identity**, **relationships**, **metric
 type NodeType =
   | 'person'
   | 'ministry'
-  | 'portfolio'
+  | 'ministerial_office'
   | 'department'
   | 'administrative_office'
   | 'public_entity'
@@ -22,7 +22,7 @@ type NodeType =
 
 ```ts
 type EdgeType =
-  | 'HOLDS_PORTFOLIO'
+  | 'HOLDS_OFFICE'
   | 'MEMBER_OF_MINISTRY'
   | 'SUPPORTED_BY_DEPARTMENT'
   | 'IN_PORTFOLIO'

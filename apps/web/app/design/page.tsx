@@ -113,7 +113,7 @@ export default function DesignPage() {
                 <Badge tone="warning">Warning</Badge>
               </div>
               <div className="space-y-[var(--gg-space-3)]">
-                <Input placeholder="Search ministers, portfolios, and departments" />
+                <Input placeholder="Search ministers, offices, and departments" />
                 <Textarea placeholder="Notes, source caveats, or editorial guidance." />
               </div>
             </Card>
@@ -148,7 +148,7 @@ export default function DesignPage() {
                     <Badge tone="muted">Lead delivery agency</Badge>
                   </>
                 }
-                description="Supports the education portfolio, child policy, and statewide school governance."
+                description="Supports the education office grouping, child policy, and statewide school governance."
                 footer={
                   <Link
                     href="/"
@@ -175,7 +175,7 @@ export default function DesignPage() {
                   </>
                 }
                 description="Published by Victorian Public Sector Commission • effective 2025-06-05"
-                metadata="Portfolio mapping"
+                metadata="Office mapping"
                 title="Working with Ministers and Ministerial Officers"
               />
             </div>
@@ -189,7 +189,7 @@ export default function DesignPage() {
             />
             <Card className="space-y-[var(--gg-space-5)] p-[var(--gg-space-6)]">
               <dl>
-                <KeyValue label="Portfolio group" value="Education" />
+                <KeyValue label="Office group" value="Education" />
                 <KeyValue label="Supporting department" value="Department of Education" />
                 <KeyValue label="Current ministry" value="Allan Ministry" />
               </dl>
@@ -260,9 +260,9 @@ export default function DesignPage() {
             <div className="grid gap-[var(--gg-space-4)]">
               <TimelineEntry
                 date="5 December 2024"
-                description="Portfolio responsibilities were regrouped under a simplified education cluster."
+                description="Office responsibilities were regrouped under a simplified education cluster."
                 detail="Machinery of Government"
-                title="Education portfolio updated"
+                title="Education office grouping updated"
               />
               <TimelineEntry
                 date="7 February 2025"

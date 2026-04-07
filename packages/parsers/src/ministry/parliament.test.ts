@@ -12,12 +12,12 @@ describe("parseParliamentGovernmentMinistry", () => {
     vi.restoreAllMocks();
   });
 
-  it("extracts people, their portfolios, and detail links", () => {
+  it("extracts people, their offices, and detail links", () => {
     const snapshot = loadFixtureParliamentGovernmentMinistry();
 
     expect(snapshot.members).toHaveLength(2);
     expect(snapshot.members[1]?.personName).toBe("Ben Carroll");
-    expect(snapshot.members[1]?.titles).toContain("Deputy Premier");
+    expect(snapshot.members[1]?.officeTitles).toContain("Deputy Premier");
     expect(snapshot.members[1]?.detailUrl).toBe(
       "https://www.parliament.vic.gov.au/members/ben-carroll/",
     );
