@@ -4,22 +4,28 @@
   "version": "0.1.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./tokens": "./src/tokens/index.ts",
+    "./tokens.css": "./src/tokens/generated.css"
   },
   "types": "./src/index.ts",
   "scripts": {
     "build": "tsc --noEmit",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "generate:tokens": "pnpm exec tsx scripts/generate-token-css.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@types/node": "^24.12.2",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "react": "^19.2.0",

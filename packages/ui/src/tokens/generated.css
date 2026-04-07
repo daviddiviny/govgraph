@@ -1,0 +1,143 @@
+/* This file is generated from packages/ui/src/tokens. */
+
+:root {
+  --gg-color-paper: #f6f1e6;
+  --gg-color-paper-strong: #fffaf1;
+  --gg-color-ink: #0e2c24;
+  --gg-color-deep: #163e35;
+  --gg-color-accent: #b94a37;
+  --gg-color-border: rgba(14, 44, 36, 0.14);
+  --gg-color-border-strong: rgba(14, 44, 36, 0.24);
+  --gg-color-muted: #5a675f;
+  --gg-color-wash: #edf1eb;
+  --gg-color-wash-strong: #dfe8dc;
+  --gg-color-white: #ffffff;
+  --gg-color-semantic-surface: rgba(255, 250, 241, 0.88);
+  --gg-color-semantic-surface-strong: rgba(255, 255, 255, 0.94);
+  --gg-color-semantic-surface-muted: rgba(237, 241, 235, 0.82);
+  --gg-color-semantic-text-primary: var(--gg-color-ink);
+  --gg-color-semantic-text-secondary: var(--gg-color-muted);
+  --gg-color-semantic-text-link: var(--gg-color-deep);
+  --gg-color-semantic-focus-ring: rgba(14, 44, 36, 0.16);
+  --gg-color-semantic-danger: #9f3f32;
+  --gg-color-semantic-success: #2f6b57;
+  --gg-color-semantic-warning: #8a6821;
+  --gg-color-node-person-bg: #e7f0ec;
+  --gg-color-node-person-border: #bfd2ca;
+  --gg-color-node-person-text: #28483d;
+  --gg-color-node-ministry-bg: #f1ece2;
+  --gg-color-node-ministry-border: #d9cdb9;
+  --gg-color-node-ministry-text: #4b3d22;
+  --gg-color-node-ministerial-office-bg: #f4e4dd;
+  --gg-color-node-ministerial-office-border: #debaa9;
+  --gg-color-node-ministerial-office-text: #6f3b2f;
+  --gg-color-node-department-bg: #e6edee;
+  --gg-color-node-department-border: #bbcdd0;
+  --gg-color-node-department-text: #26494f;
+  --gg-color-node-administrative-office-bg: #ece8f1;
+  --gg-color-node-administrative-office-border: #c9bfd7;
+  --gg-color-node-administrative-office-text: #493764;
+  --gg-color-node-public-entity-bg: #edf0e4;
+  --gg-color-node-public-entity-border: #c9d3b2;
+  --gg-color-node-public-entity-text: #4e5d2d;
+  --gg-color-node-program-output-bg: #f6e8d8;
+  --gg-color-node-program-output-border: #e2c59d;
+  --gg-color-node-program-output-text: #7b5523;
+  --gg-color-node-capital-project-bg: #f3e2d6;
+  --gg-color-node-capital-project-border: #dfbba4;
+  --gg-color-node-capital-project-text: #744630;
+  --gg-color-node-performance-measure-bg: #e2eeeb;
+  --gg-color-node-performance-measure-border: #b4d0c6;
+  --gg-color-node-performance-measure-text: #2d5d52;
+  --gg-color-node-budget-document-bg: #f2ead5;
+  --gg-color-node-budget-document-border: #dbcaa0;
+  --gg-color-node-budget-document-text: #6c5523;
+  --gg-color-node-source-document-bg: #ebe8e2;
+  --gg-color-node-source-document-border: #ccc4b7;
+  --gg-color-node-source-document-text: #52473a;
+  --gg-color-node-organisation-group-bg: #ede4df;
+  --gg-color-node-organisation-group-border: #cfbeb2;
+  --gg-color-node-organisation-group-text: #5c4438;
+  --gg-font-family-display: var(--font-display), "Iowan Old Style", Georgia, serif;
+  --gg-font-family-body: var(--font-body), "Helvetica Neue", Arial, sans-serif;
+  --gg-font-family-mono: var(--font-mono), "SFMono-Regular", monospace;
+  --gg-font-size-xs: 0.75rem;
+  --gg-font-size-sm: 0.875rem;
+  --gg-font-size-base: 1rem;
+  --gg-font-size-lg: 1.125rem;
+  --gg-font-size-xl: 1.25rem;
+  --gg-font-size-2xl: 1.5rem;
+  --gg-font-size-3xl: 1.875rem;
+  --gg-font-size-4xl: 2.25rem;
+  --gg-font-size-5xl: 3rem;
+  --gg-font-size-6xl: 3.75rem;
+  --gg-font-weight-regular: 400;
+  --gg-font-weight-medium: 500;
+  --gg-font-weight-semibold: 600;
+  --gg-font-weight-bold: 700;
+  --gg-font-line-height-tight: 1.1;
+  --gg-font-line-height-snug: 1.25;
+  --gg-font-line-height-body: 1.6;
+  --gg-font-line-height-relaxed: 1.8;
+  --gg-font-letter-spacing-tight: -0.03em;
+  --gg-font-letter-spacing-normal: 0em;
+  --gg-font-letter-spacing-caps: 0.18em;
+  --gg-font-letter-spacing-eyebrow: 0.24em;
+  --gg-font-heading-eyebrow-size: var(--gg-font-size-xs);
+  --gg-font-heading-eyebrow-weight: var(--gg-font-weight-semibold);
+  --gg-font-heading-eyebrow-line-height: var(--gg-font-line-height-snug);
+  --gg-font-heading-eyebrow-letter-spacing: var(--gg-font-letter-spacing-eyebrow);
+  --gg-font-heading-section-size: var(--gg-font-size-3xl);
+  --gg-font-heading-section-weight: var(--gg-font-weight-semibold);
+  --gg-font-heading-section-line-height: var(--gg-font-line-height-tight);
+  --gg-font-heading-section-letter-spacing: var(--gg-font-letter-spacing-tight);
+  --gg-font-heading-display-size: var(--gg-font-size-6xl);
+  --gg-font-heading-display-weight: var(--gg-font-weight-semibold);
+  --gg-font-heading-display-line-height: var(--gg-font-line-height-tight);
+  --gg-font-heading-display-letter-spacing: var(--gg-font-letter-spacing-tight);
+  --gg-space-0: 0rem;
+  --gg-space-1: 0.25rem;
+  --gg-space-2: 0.5rem;
+  --gg-space-3: 0.75rem;
+  --gg-space-4: 1rem;
+  --gg-space-5: 1.25rem;
+  --gg-space-6: 1.5rem;
+  --gg-space-8: 2rem;
+  --gg-space-10: 2.5rem;
+  --gg-space-12: 3rem;
+  --gg-space-16: 4rem;
+  --gg-space-20: 5rem;
+  --gg-space-24: 6rem;
+  --gg-radius-sm: 0.75rem;
+  --gg-radius-md: 1rem;
+  --gg-radius-lg: 1.75rem;
+  --gg-radius-xl: 2rem;
+  --gg-radius-2xl: 2.5rem;
+  --gg-radius-full: 9999px;
+  --gg-shadow-sm: 0 10px 30px rgba(14, 44, 36, 0.06);
+  --gg-shadow-md: 0 18px 48px rgba(14, 44, 36, 0.08);
+  --gg-shadow-lg: 0 30px 90px rgba(14, 44, 36, 0.09);
+  --gg-animation-duration-fast: 100ms;
+  --gg-animation-duration-normal: 160ms;
+  --gg-animation-duration-slow: 300ms;
+  --gg-animation-easing-standard: ease;
+}
+
+:root {
+  --govgraph-paper: var(--gg-color-paper);
+  --govgraph-ink: var(--gg-color-ink);
+  --govgraph-deep: var(--gg-color-deep);
+  --govgraph-accent: var(--gg-color-accent);
+  --govgraph-border: var(--gg-color-border);
+  --govgraph-muted: var(--gg-color-muted);
+  --govgraph-wash: var(--gg-color-wash);
+}
+
+@keyframes gg-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

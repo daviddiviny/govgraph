@@ -1,17 +1,8 @@
 @import "tailwindcss";
-
-:root {
-  --govgraph-paper: #f6f1e6;
-  --govgraph-ink: #0e2c24;
-  --govgraph-deep: #163e35;
-  --govgraph-accent: #b94a37;
-  --govgraph-border: rgba(14, 44, 36, 0.14);
-  --govgraph-muted: #5a675f;
-  --govgraph-wash: #edf1eb;
-}
+@import "@govgraph/ui/tokens.css";
 
 html {
-  background: var(--govgraph-paper);
+  background: var(--gg-color-paper);
 }
 
 body {
@@ -20,9 +11,9 @@ body {
     linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(246, 241, 230, 1)),
     radial-gradient(circle at top left, rgba(32, 96, 79, 0.18), transparent 28%),
     radial-gradient(circle at bottom right, rgba(185, 74, 55, 0.12), transparent 24%),
-    var(--govgraph-paper);
-  color: var(--govgraph-ink);
-  font-family: var(--font-body), sans-serif;
+    var(--gg-color-paper);
+  color: var(--gg-color-ink);
+  font-family: var(--gg-font-family-body);
 }
 
 body::before {
@@ -40,21 +31,28 @@ body::before {
 h1,
 h2,
 h3 {
-  font-family: var(--font-display), serif;
+  font-family: var(--gg-font-family-display);
 }
 
 code,
 pre {
-  font-family: var(--font-mono), monospace;
+  font-family: var(--gg-font-family-mono);
 }
 
 a,
 button,
-input {
+input,
+textarea {
   transition:
-    color 160ms ease,
-    border-color 160ms ease,
-    background-color 160ms ease,
-    transform 160ms ease,
-    box-shadow 160ms ease;
+    color var(--gg-animation-duration-normal) var(--gg-animation-easing-standard),
+    border-color var(--gg-animation-duration-normal) var(--gg-animation-easing-standard),
+    background-color var(--gg-animation-duration-normal)
+      var(--gg-animation-easing-standard),
+    transform var(--gg-animation-duration-normal) var(--gg-animation-easing-standard),
+    box-shadow var(--gg-animation-duration-normal) var(--gg-animation-easing-standard);
+}
+
+::selection {
+  background: rgba(185, 74, 55, 0.18);
+  color: var(--gg-color-ink);
 }
