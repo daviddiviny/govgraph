@@ -1,3 +1,4 @@
+export * from "./act-administration";
 export * from "./change-events";
 export * from "./edges";
 export * from "./enums";

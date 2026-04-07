@@ -88,3 +88,34 @@ export const changeEventTypeEnum = pgEnum("change_event_type", [
   "transferred",
   "portfolio_changed",
 ]);
+
+export const generalOrderHeadingStyleEnum = pgEnum("general_order_heading_style", [
+  "plain",
+  "except",
+  "scoped_list",
+]);
+
+export const administrationModeEnum = pgEnum("administration_mode", [
+  "sole",
+  "joint",
+  "joint_and_several",
+  "unknown",
+]);
+
+export const administrationScopeEnum = pgEnum("administration_scope", [
+  "whole_act",
+  "provision_list",
+  "residual",
+]);
+
+export const generalOrderRuleKindEnum = pgEnum("general_order_rule_kind", [
+  "default",
+  "listed_scope",
+  "residual",
+]);
+
+export const generalOrderParseStatusEnum = pgEnum("general_order_parse_status", [
+  "parsed",
+  "partial",
+  "review",
+]);
