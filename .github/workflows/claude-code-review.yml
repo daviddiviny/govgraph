@@ -2,43 +2,88 @@ name: Claude Code Review
 
 on:
   pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+    types:
+      - opened
+      - synchronize
+      - ready_for_review
+      - reopened
+    # Skip docs-only pull requests. PRs that also change code still run the review.
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+
+concurrency:
+  group: claude-code-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
-
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
-      pull-requests: read
-      issues: read
+      pull-requests: write
       id-token: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
+      - name: Detect changes to this workflow
+        id: workflow-changes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100,
+            })
+
+            const workflowPath = '.github/workflows/claude-code-review.yml'
+            const changed = files.some((file) => file.filename === workflowPath)
+
+            core.setOutput('self_changed', changed ? 'true' : 'false')
+
+      - name: Log skipped self-review
+        if: steps.workflow-changes.outputs.self_changed == 'true'
+        run: |
+          echo "Skipping Claude Code Review because this PR modifies .github/workflows/claude-code-review.yml."
+
       - name: Run Claude Code Review
+        if: steps.workflow-changes.outputs.self_changed != 'true'
         id: claude-review
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
-          plugins: 'code-review@claude-code-plugins'
-          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://code.claude.com/docs/en/cli-reference for available options
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
 
+            Review this pull request against the standards in AGENTS.md.
+
+            Focus on:
+            - correctness and likely regressions
+            - missing validation, error handling, or authorization checks
+            - maintainability and consistency with the repository's house stack
+            - missing or weak tests for changed behavior
+            - performance or data-access problems introduced by the change
+
+            Keep the review high signal:
+            - comment only when you find a concrete, actionable issue
+            - prefer inline comments for file-specific findings
+            - use mcp__github_inline_comment__create_inline_comment with confirmed: true for inline review comments
+            - use a single top-level comment only for cross-cutting concerns or when no actionable issues remain
+            - do not restate the PR description or praise unchanged code
+            - do not suggest new frameworks or parallel patterns that conflict with AGENTS.md
+
+            The PR branch is already checked out in the working directory.
+            Only post GitHub comments. Do not return the review as plain action output.
+          claude_args: |
+            --model claude-opus-4-6
+            --allowedTools "Read,Glob,Grep,mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
