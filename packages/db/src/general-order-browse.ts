@@ -162,7 +162,7 @@ export function buildGeneralOrderActEntries(
   const entries = new Map<string, GeneralOrderActEntry>();
 
   for (const row of rows) {
-    const key = `${row.actName}::${row.headingText}::${row.headingStyle}`;
+    const key = `${row.officeName}::${row.actName}::${row.headingText}::${row.headingStyle}`;
     const existing = entries.get(key);
 
     if (existing) {
@@ -185,6 +185,42 @@ export function buildGeneralOrderActEntries(
       rules: [...entry.rules].sort(compareRules),
     }))
     .sort((left, right) => left.actName.localeCompare(right.actName));
+}
+
+async function getGeneralOrderSourceRowById(
+  db: GovgraphDb,
+  sourceDocumentId: string,
+): Promise<GeneralOrderSourceSummaryRow | null> {
+  const [row] = await db
+    .select({
+      sourceDocumentId: actAdministrationRules.sourceDocumentId,
+      title: sourceDocuments.title,
+      sourceUrl: sourceDocuments.sourceUrl,
+      effectiveDate: sourceDocuments.effectiveDate,
+      retrievedAt: sourceDocuments.retrievedAt,
+      officeCount: sql<number>`count(distinct ${actAdministrationRules.officeName})`,
+      actEntryCount:
+        sql<number>`count(distinct ${actAdministrationRules.officeName} || '::' || ${actAdministrationRules.actName} || '::' || ${actAdministrationRules.headingText} || '::' || ${actAdministrationRules.headingStyle})`,
+      ruleCount: sql<number>`count(*)`,
+      partialRuleCount:
+        sql<number>`sum(case when ${actAdministrationRules.parseStatus} <> 'parsed' then 1 else 0 end)`,
+    })
+    .from(actAdministrationRules)
+    .innerJoin(
+      sourceDocuments,
+      eq(actAdministrationRules.sourceDocumentId, sourceDocuments.id),
+    )
+    .where(eq(actAdministrationRules.sourceDocumentId, sourceDocumentId))
+    .groupBy(
+      actAdministrationRules.sourceDocumentId,
+      sourceDocuments.title,
+      sourceDocuments.sourceUrl,
+      sourceDocuments.effectiveDate,
+      sourceDocuments.retrievedAt,
+    )
+    .limit(1);
+
+  return row ?? null;
 }
 
 async function getLatestGeneralOrderSourceRow(
@@ -230,6 +266,25 @@ export async function getLatestGeneralOrderSourceSummary(
   return row ? toSourceSummary(row) : null;
 }
 
+async function resolveGeneralOrderSourceSummary(
+  db: GovgraphDb,
+  sourceDocumentId?: string,
+): Promise<GeneralOrderSourceSummary | null> {
+  if (sourceDocumentId === undefined) {
+    return getLatestGeneralOrderSourceSummary(db);
+  }
+
+  const latestRow = await getLatestGeneralOrderSourceRow(db);
+
+  if (latestRow?.sourceDocumentId === sourceDocumentId) {
+    return toSourceSummary(latestRow);
+  }
+
+  const sourceRow = await getGeneralOrderSourceRowById(db, sourceDocumentId);
+
+  return sourceRow ? toSourceSummary(sourceRow) : null;
+}
+
 export async function listGeneralOrderOfficeSummaries(
   db: GovgraphDb,
   sourceDocumentId?: string,
@@ -269,47 +324,10 @@ export async function getGeneralOrderOfficeDetail(
   officeSlug: string,
   sourceDocumentId?: string,
 ): Promise<GeneralOrderOfficeDetail | null> {
-  const sourceSummary =
-    sourceDocumentId === undefined
-      ? await getLatestGeneralOrderSourceSummary(db)
-      : await (async () => {
-          const latestRow = await getLatestGeneralOrderSourceRow(db);
-          if (!latestRow || latestRow.sourceDocumentId !== sourceDocumentId) {
-            const [sourceRow] = await db
-              .select({
-                sourceDocumentId: actAdministrationRules.sourceDocumentId,
-                title: sourceDocuments.title,
-                sourceUrl: sourceDocuments.sourceUrl,
-                effectiveDate: sourceDocuments.effectiveDate,
-                retrievedAt: sourceDocuments.retrievedAt,
-                officeCount:
-                  sql<number>`count(distinct ${actAdministrationRules.officeName})`,
-                actEntryCount:
-                  sql<number>`count(distinct ${actAdministrationRules.officeName} || '::' || ${actAdministrationRules.actName} || '::' || ${actAdministrationRules.headingText} || '::' || ${actAdministrationRules.headingStyle})`,
-                ruleCount: sql<number>`count(*)`,
-                partialRuleCount:
-                  sql<number>`sum(case when ${actAdministrationRules.parseStatus} <> 'parsed' then 1 else 0 end)`,
-              })
-              .from(actAdministrationRules)
-              .innerJoin(
-                sourceDocuments,
-                eq(actAdministrationRules.sourceDocumentId, sourceDocuments.id),
-              )
-              .where(eq(actAdministrationRules.sourceDocumentId, sourceDocumentId))
-              .groupBy(
-                actAdministrationRules.sourceDocumentId,
-                sourceDocuments.title,
-                sourceDocuments.sourceUrl,
-                sourceDocuments.effectiveDate,
-                sourceDocuments.retrievedAt,
-              )
-              .limit(1);
-
-            return sourceRow ? toSourceSummary(sourceRow) : null;
-          }
-
-          return toSourceSummary(latestRow);
-        })();
+  const sourceSummary = await resolveGeneralOrderSourceSummary(
+    db,
+    sourceDocumentId,
+  );
 
   if (!sourceSummary) {
     return null;

@@ -73,6 +73,61 @@ describe("buildGeneralOrderActEntries", () => {
     expect(entries[0]?.rules[0]?.ruleKind).toBe("default");
     expect(entries[0]?.rules[1]?.kanonAssistance?.status).toBe("enriched");
   });
+
+  it("keeps shared Acts separate for each office", () => {
+    const entries = buildGeneralOrderActEntries([
+      {
+        officeName: "Attorney-General",
+        actName: "Bail Act 1977",
+        headingText: "Bail Act 1977 - Except:",
+        headingStyle: "except",
+        ruleKind: "default",
+        scope: "whole_act",
+        rawText: "The Act is administered by Attorney-General",
+        scopeText: null,
+        administrationMode: "sole",
+        administeringOfficeNames: ["Attorney-General"],
+        provisionReferences: [],
+        nestedRawTexts: [],
+        parseStatus: "parsed",
+        unparsedTail: null,
+        kanonAssistance: null,
+      },
+      {
+        officeName: "Minister for Youth Justice",
+        actName: "Bail Act 1977",
+        headingText: "Bail Act 1977 - Except:",
+        headingStyle: "except",
+        ruleKind: "listed_scope",
+        scope: "provision_list",
+        rawText:
+          "Section 3B and Part 2A (these provisions are jointly and severally administered with the Attorney-General)",
+        scopeText: "Section 3B and Part 2A",
+        administrationMode: "joint_and_several",
+        administeringOfficeNames: [
+          "Minister for Youth Justice",
+          "Attorney-General",
+        ],
+        provisionReferences: [
+          {
+            rawText: "Section 3B",
+            unit: "section",
+            label: "3B",
+          },
+        ],
+        nestedRawTexts: [],
+        parseStatus: "parsed",
+        unparsedTail: null,
+        kanonAssistance: null,
+      },
+    ]);
+
+    expect(entries).toHaveLength(2);
+    expect(entries.map((entry) => entry.officeName)).toEqual([
+      "Attorney-General",
+      "Minister for Youth Justice",
+    ]);
+  });
 });
 
 describe("buildGeneralOrderOfficeSummary", () => {

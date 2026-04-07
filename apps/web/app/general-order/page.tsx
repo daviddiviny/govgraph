@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { Route } from "next";
 import Link from "next/link";
 
-import { Badge, Card } from "@govgraph/ui";
+import { Badge, Card, EmptyState } from "@govgraph/ui";
 
 import { loadGeneralOrderOverview } from "./_lib/data";
 
@@ -14,35 +14,16 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-function EmptyState({
-  title,
-  body,
-}: {
-  title: string;
-  body: string;
-}) {
-  return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-semibold tracking-tight text-[var(--govgraph-ink)]">
-        {title}
-      </h2>
-      <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--govgraph-muted)]">
-        {body}
-      </p>
-    </Card>
-  );
-}
-
 export default async function GeneralOrderPage() {
   const state = await loadGeneralOrderOverview();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-8 sm:px-8 lg:px-10 lg:py-12">
-      <header className="grid gap-6 rounded-[2rem] border border-[var(--govgraph-border)] bg-white/75 p-6 shadow-[0_24px_80px_rgba(14,44,36,0.08)] backdrop-blur-sm lg:grid-cols-[1.2fr_0.8fr] lg:p-8">
+      <header className="grid gap-6 rounded-[2rem] border border-[var(--gg-color-border)] bg-white/75 p-6 shadow-[0_24px_80px_rgba(14,44,36,0.08)] backdrop-blur-sm lg:grid-cols-[1.2fr_0.8fr] lg:p-8">
         <div className="space-y-5">
           <Link
             href="/"
-            className="inline-flex text-sm font-medium uppercase tracking-[0.2em] text-[var(--govgraph-muted)] underline-offset-4 hover:underline"
+            className="inline-flex text-sm font-medium uppercase tracking-[0.2em] text-[var(--gg-color-semantic-text-secondary)] underline-offset-4 hover:underline"
           >
             Back to atlas
           </Link>
@@ -51,10 +32,10 @@ export default async function GeneralOrderPage() {
             <Badge>Database-backed</Badge>
           </div>
           <div className="space-y-3">
-            <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-[var(--govgraph-ink)] sm:text-5xl">
+            <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-[var(--gg-color-ink)] sm:text-5xl">
               Browse Act allocations by ministerial office
             </h1>
-            <p className="max-w-3xl text-base leading-8 text-[var(--govgraph-muted)] sm:text-lg">
+            <p className="max-w-3xl text-base leading-8 text-[var(--gg-color-semantic-text-secondary)] sm:text-lg">
               This view shows the latest imported Victorian General Order as a
               browsable office index, so you can move from an office to the
               Acts and carve-outs it administers.
@@ -65,31 +46,31 @@ export default async function GeneralOrderPage() {
         {state.status === "ready" ? (
           <div className="grid gap-4 sm:grid-cols-2">
             <Card className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--gg-color-semantic-text-secondary)]">
                 Offices
               </p>
-              <p className="mt-4 text-4xl font-semibold text-[var(--govgraph-ink)]">
+              <p className="mt-4 text-4xl font-semibold text-[var(--gg-color-ink)]">
                 {state.source.officeCount}
               </p>
-              <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
+              <p className="mt-2 text-sm leading-6 text-[var(--gg-color-semantic-text-secondary)]">
                 ministerial offices in the imported order.
               </p>
             </Card>
             <Card className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--gg-color-semantic-text-secondary)]">
                 Rules
               </p>
-              <p className="mt-4 text-4xl font-semibold text-[var(--govgraph-ink)]">
+              <p className="mt-4 text-4xl font-semibold text-[var(--gg-color-ink)]">
                 {state.source.ruleCount}
               </p>
-              <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
+              <p className="mt-2 text-sm leading-6 text-[var(--gg-color-semantic-text-secondary)]">
                 parsed administration rules, including shared and partial ones.
               </p>
             </Card>
           </div>
         ) : (
           <Card className="p-5">
-            <p className="text-sm leading-7 text-[var(--govgraph-muted)]">
+            <p className="text-sm leading-7 text-[var(--gg-color-semantic-text-secondary)]">
               The General Order browser reads from Postgres, so this page comes
               alive once the import has been loaded into the database.
             </p>
@@ -100,14 +81,14 @@ export default async function GeneralOrderPage() {
       {state.status === "empty" ? (
         <EmptyState
           title="No General Order data loaded yet"
-          body="Run the General Order import into your local Postgres database, then refresh this page. The rest of the atlas can still run without it, but this browser only shows imported records."
+          description="Run the General Order import into your local Postgres database, then refresh this page. The rest of the atlas can still run without it, but this browser only shows imported records."
         />
       ) : null}
 
       {state.status === "error" ? (
         <EmptyState
           title="Could not reach the General Order database"
-          body={`This page could not read the imported records. Make sure Postgres is running and DATABASE_URL points at the database with the imported General Order rows. Error: ${state.message}`}
+          description={`This page could not read the imported records. Make sure Postgres is running and DATABASE_URL points at the database with the imported General Order rows. Error: ${state.message}`}
         />
       ) : null}
 
@@ -115,48 +96,48 @@ export default async function GeneralOrderPage() {
         <>
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Card className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--gg-color-semantic-text-secondary)]">
                 Act entries
               </p>
-              <p className="mt-4 text-4xl font-semibold text-[var(--govgraph-ink)]">
+              <p className="mt-4 text-4xl font-semibold text-[var(--gg-color-ink)]">
                 {state.source.actEntryCount}
               </p>
-              <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
+              <p className="mt-2 text-sm leading-6 text-[var(--gg-color-semantic-text-secondary)]">
                 office-by-Act allocations captured from the order.
               </p>
             </Card>
             <Card className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--gg-color-semantic-text-secondary)]">
                 Partial rules
               </p>
-              <p className="mt-4 text-4xl font-semibold text-[var(--govgraph-ink)]">
+              <p className="mt-4 text-4xl font-semibold text-[var(--gg-color-ink)]">
                 {state.source.partialRuleCount}
               </p>
-              <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
+              <p className="mt-2 text-sm leading-6 text-[var(--gg-color-semantic-text-secondary)]">
                 rules that still preserve original wording alongside the parse.
               </p>
             </Card>
             <Card className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--gg-color-semantic-text-secondary)]">
                 Effective date
               </p>
-              <p className="mt-4 text-2xl font-semibold text-[var(--govgraph-ink)]">
+              <p className="mt-4 text-2xl font-semibold text-[var(--gg-color-ink)]">
                 {state.source.effectiveDate ?? "Not recorded"}
               </p>
-              <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
+              <p className="mt-2 text-sm leading-6 text-[var(--gg-color-semantic-text-secondary)]">
                 date attached to the imported source document.
               </p>
             </Card>
             <Card className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--govgraph-muted)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--gg-color-semantic-text-secondary)]">
                 Source
               </p>
-              <h2 className="mt-4 text-lg font-semibold text-[var(--govgraph-ink)]">
+              <h2 className="mt-4 text-lg font-semibold text-[var(--gg-color-ink)]">
                 {state.source.title}
               </h2>
               <a
                 href={state.source.sourceUrl}
-                className="mt-3 inline-flex text-sm font-medium text-[var(--govgraph-accent)] underline-offset-4 hover:underline"
+                className="mt-3 inline-flex text-sm font-medium text-[var(--gg-color-accent)] underline-offset-4 hover:underline"
               >
                 Open official page
               </a>
@@ -165,10 +146,10 @@ export default async function GeneralOrderPage() {
 
           <section className="space-y-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--govgraph-muted)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gg-color-semantic-text-secondary)]">
                 Offices
               </p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[var(--govgraph-ink)]">
+              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[var(--gg-color-ink)]">
                 Current office index
               </h2>
             </div>
@@ -190,11 +171,11 @@ export default async function GeneralOrderPage() {
                   </div>
                   <Link
                     href={`/general-order/${office.officeSlug}` as Route}
-                    className="mt-4 block text-2xl font-semibold tracking-tight text-[var(--govgraph-ink)] underline-offset-4 hover:underline"
+                    className="mt-4 block text-2xl font-semibold tracking-tight text-[var(--gg-color-ink)] underline-offset-4 hover:underline"
                   >
                     {office.officeName}
                   </Link>
-                  <p className="mt-2 text-sm leading-6 text-[var(--govgraph-muted)]">
+                  <p className="mt-2 text-sm leading-6 text-[var(--gg-color-semantic-text-secondary)]">
                     Browse the Acts, carve-outs, and shared arrangements recorded
                     for this office in the imported order.
                   </p>

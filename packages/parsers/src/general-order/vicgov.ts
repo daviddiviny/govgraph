@@ -451,6 +451,7 @@ export function parseVicGovGeneralOrder(html: string): GeneralOrderDataset {
       sourceUrl: VIC_GOV_GENERAL_ORDER_URL,
       publisher: "Victorian Government",
       effectiveDate,
+      // Bump this when the parser's structured output changes materially so imports stay traceable.
       parserVersion: "sprint-1-general-order",
       rawStoragePath: "live/vic-gov-general-order-2025-10-30.html",
     }),

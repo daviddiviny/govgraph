@@ -154,6 +154,33 @@ describe("buildGeneralOrderSearchResults", () => {
     });
   });
 
+  it("keeps office-specific rule counts separate for shared Acts", () => {
+    const results = buildGeneralOrderSearchResults(
+      officeSummaries,
+      rows,
+      "Bail Act 1977",
+      5,
+    );
+
+    const actResults = results.filter(
+      (result): result is Extract<typeof result, { kind: "act" }> =>
+        result.kind === "act",
+    );
+
+    expect(actResults).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          officeName: "Attorney-General",
+          ruleCount: 2,
+        }),
+        expect.objectContaining({
+          officeName: "Minister for Youth Justice",
+          ruleCount: 1,
+        }),
+      ]),
+    );
+  });
+
   it("matches provision references for scoped carve-outs", () => {
     const results = buildGeneralOrderSearchResults(
       officeSummaries,
