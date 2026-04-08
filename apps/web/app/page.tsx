@@ -15,8 +15,10 @@ import {
   StatCard,
 } from "@govgraph/ui";
 
+import { GovernmentAtlasGraph } from "./_components/government-atlas-graph";
 import { SearchForm } from "./_components/search-form";
 import { loadGeneralOrderSearch } from "./general-order/_lib/data";
+import { buildHomeGraph } from "./_lib/home-graph";
 import { firstQueryValue, humanizeSourceFamily } from "./_lib/presenters";
 
 type HomePageProps = {
@@ -95,11 +97,7 @@ function GeneralOrderSearchCard({
           ) : null}
         </>
       }
-      description={
-        <>
-          <span className="font-medium">Under {result.officeName}</span>
-        </>
-      }
+      description={<span className="font-medium">Under {result.officeName}</span>}
       footer={
         <div className="space-y-[var(--gg-space-2)]">
           <p className="text-[length:var(--gg-font-size-sm)] leading-[var(--gg-font-line-height-body)] text-[var(--gg-color-semantic-text-secondary)]">
@@ -132,57 +130,48 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       : Promise.resolve({ status: "empty" as const }),
   ]);
   const results = query ? searchGovernmentCatalog(catalog, query, 12) : [];
+  const homeGraph = buildHomeGraph(catalog, query);
+  const featuredNodes = homeGraph.nodes.slice(0, 8);
   const generalOrderResults =
     generalOrderSearch.status === "ready" ? generalOrderSearch.results : [];
   const totalSearchMatches = results.length + generalOrderResults.length;
-  const featuredNodes = [
-    ...catalog.nodes
-      .filter((node) => node.nodeType === "budget_document")
-      .slice(0, 2),
-    ...catalog.nodes
-      .filter((node) => node.nodeType === "public_entity")
-      .slice(0, 2),
-    ...catalog.nodes.filter((node) => node.nodeType === "department").slice(0, 2),
-    ...catalog.nodes
-      .filter((node) => node.nodeType === "ministerial_office")
-      .slice(0, 1),
-    ...catalog.nodes.filter((node) => node.nodeType === "person").slice(0, 1),
-  ].slice(0, 8);
   const implementedConnectors = sourceRegistry.filter(
     (entry) => entry.implementationStatus === "implemented",
   );
 
   return (
     <main>
-      <PageShell className="gap-[var(--gg-space-10)]">
+      <PageShell className="max-w-[92rem] gap-[var(--gg-space-10)]">
         <section className="relative overflow-hidden rounded-[var(--gg-radius-2xl)] border border-[var(--gg-color-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(250,245,235,0.92))] p-[var(--gg-space-6)] shadow-[var(--gg-shadow-lg)] backdrop-blur-sm sm:p-[var(--gg-space-8)] lg:p-[var(--gg-space-10)]">
-          <div className="absolute -right-16 top-0 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(185,74,55,0.22),rgba(185,74,55,0))]" />
-          <div className="absolute -left-8 bottom-0 h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(32,96,79,0.18),rgba(32,96,79,0))]" />
-          <div className="relative grid gap-[var(--gg-space-8)] lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="absolute -right-24 top-0 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(185,74,55,0.22),rgba(185,74,55,0))]" />
+          <div className="absolute -left-10 bottom-0 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(32,96,79,0.18),rgba(32,96,79,0))]" />
+
+          <div className="relative grid gap-[var(--gg-space-8)] xl:grid-cols-[0.68fr_1.32fr] xl:items-start">
             <div className="space-y-[var(--gg-space-6)]">
               <div className="flex flex-wrap gap-[var(--gg-space-3)]">
                 <Badge tone="accent">Official source first</Badge>
-                <Badge tone="success">Sprint 2 underway</Badge>
+                <Badge tone="success">Graph-led homepage</Badge>
               </div>
+
               <div className="space-y-[var(--gg-space-4)]">
                 <p className="text-[length:var(--gg-font-size-xs)] font-semibold uppercase tracking-[var(--gg-font-letter-spacing-eyebrow)] text-[var(--gg-color-semantic-text-secondary)]">
-                  Victorian Government Map
+                  Victorian Government Atlas
                 </p>
                 <h1 className="max-w-4xl font-[family-name:var(--gg-font-family-display)] text-[length:var(--gg-font-size-5xl)] font-semibold tracking-[var(--gg-font-letter-spacing-tight)] text-[var(--gg-color-ink)] sm:text-[length:var(--gg-font-size-6xl)]">
-                  Search the Victorian Government across structure, offices,
-                  entities, and budget papers.
+                  Explore the website as a living map of relationships, not just a
+                  search box.
                 </h1>
                 <p className="max-w-3xl text-[length:var(--gg-font-size-base)] leading-[var(--gg-font-line-height-relaxed)] text-[var(--gg-color-semantic-text-secondary)] sm:text-[length:var(--gg-font-size-lg)]">
-                  The graph now combines the current ministry and office map
-                  with the VPSC employers directory and the Victorian Budget
-                  paper index, plus structured budget outputs and performance
-                  measures, so public entities and budget records sit beside
-                  the core government structure.
+                  GovGraph now opens on a visual network of ministers, offices,
+                  departments, public entities, and published outputs so the
+                  shape of government is visible before you drill into records.
                 </p>
               </div>
+
               <div className="space-y-[var(--gg-space-4)]">
                 <SearchForm
                   {...(query ? { defaultValue: query } : {})}
+                  placeholder="Search the graph by minister, office, department, or entity"
                   size="lg"
                 />
                 <div className="flex flex-wrap gap-[var(--gg-space-4)] text-[length:var(--gg-font-size-sm)] font-medium text-[var(--gg-color-semantic-text-secondary)]">
@@ -192,40 +181,48 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                   >
                     Browse General Order Act allocations
                   </Link>
+                  <Link
+                    href={featuredNodes[0]?.href ?? ("/" as Route)}
+                    className="underline-offset-4 hover:text-[var(--gg-color-deep)] hover:underline"
+                  >
+                    Open a featured graph record
+                  </Link>
                 </div>
               </div>
             </div>
 
-            <div className="grid gap-[var(--gg-space-4)] sm:grid-cols-2 lg:grid-cols-2">
-              <StatCard
-                description="Records across ministers, offices, departments, public entities, outputs, measures, and budget documents."
-                label="Live snapshot"
-                value={catalog.summary.totalNodes}
-              />
-              <StatCard
-                description="Live parsers feeding the search and node pages right now."
-                label="Connectors"
-                value={implementedConnectors.length}
-              />
-              <StatCard
-                description="Employer records pulled in from the live VPSC directory snapshot."
-                label="Public entities"
-                value={catalog.summary.countsByType.public_entity}
-              />
-              <StatCard
-                description="Indexed papers and budget tools now searchable from the same atlas."
-                label="Budget documents"
-                value={catalog.summary.countsByType.budget_document}
-              />
-            </div>
+            <GovernmentAtlasGraph graph={homeGraph} query={query} />
+          </div>
+
+          <div className="relative mt-[var(--gg-space-8)] grid gap-[var(--gg-space-4)] sm:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              description="Active nodes participating in the relationship map right now."
+              label="Connected records"
+              value={homeGraph.summary.connectedNodes}
+            />
+            <StatCard
+              description="Direct relationships currently feeding the visual network."
+              label="Live links"
+              value={homeGraph.summary.connectedEdges}
+            />
+            <StatCard
+              description="Budget papers and source documents searchable outside the live map."
+              label="Searchable documents"
+              value={homeGraph.summary.isolatedDocuments}
+            />
+            <StatCard
+              description="Source pipelines currently keeping the atlas fresh."
+              label="Connectors"
+              value={implementedConnectors.length}
+            />
           </div>
         </section>
 
-        <section className="grid gap-[var(--gg-space-6)] lg:grid-cols-[1.2fr_0.8fr]">
+        <section className="grid gap-[var(--gg-space-6)] lg:grid-cols-[1.18fr_0.82fr]">
           <div className="space-y-[var(--gg-space-4)]">
             <SectionHeader
-              eyebrow="Search results"
-              title={query ? `Results for “${query}”` : "Featured records"}
+              eyebrow="Search and records"
+              title={query ? `Results for “${query}”` : "Records featured in the map"}
               trailing={
                 query
                   ? `${totalSearchMatches} ${totalSearchMatches === 1 ? "match" : "matches"}`
@@ -240,26 +237,26 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                     eyebrow="Atlas results"
                     title="Current graph records"
                   />
-                  {results.length === 0 ? (
-                    <EmptyState
-                      description={`Try a minister title, department name, public entity, or budget keyword from the current Victorian Government data.`}
-                      title={`No live records match “${query}”`}
-                    />
-                  ) : (
+                  {results.length > 0 ? (
                     results.map((result) => {
                       const node = result.node;
 
                       return (
                         <NodeCard
                           key={node.id}
-                          badges={<NodeTypeBadge nodeType={node.nodeType} />}
+                          badges={
+                            <>
+                              <NodeTypeBadge nodeType={node.nodeType} />
+                              <Badge tone="muted">{result.matchReason}</Badge>
+                            </>
+                          }
                           description={
                             node.description ??
                             "Current record in the live government graph snapshot."
                           }
                           title={
                             <Link
-                              href={`/nodes/${node.slug}`}
+                              href={`/nodes/${node.slug}` as Route}
                               className="underline-offset-4 hover:underline"
                             >
                               {node.canonicalName}
@@ -268,6 +265,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                         />
                       );
                     })
+                  ) : (
+                    <EmptyState
+                      description={`Try a minister title, department name, public entity, or budget keyword from the current Victorian Government data.`}
+                      title={`No live records match “${query}”`}
+                    />
                   )}
 
                   <SearchSubsectionHeading
@@ -310,17 +312,24 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 featuredNodes.map((node) => (
                   <NodeCard
                     key={node.id}
-                    badges={<NodeTypeBadge nodeType={node.nodeType} />}
+                    badges={
+                      <>
+                        <NodeTypeBadge nodeType={node.nodeType} />
+                        <Badge tone="muted">
+                          {node.degree} live link{node.degree === 1 ? "" : "s"}
+                        </Badge>
+                      </>
+                    }
                     description={
                       node.description ??
                       "Current record in the live government graph snapshot."
                     }
                     title={
                       <Link
-                        href={`/nodes/${node.slug}`}
+                        href={node.href}
                         className="underline-offset-4 hover:underline"
                       >
-                        {node.canonicalName}
+                        {node.label}
                       </Link>
                     }
                   />
@@ -331,9 +340,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
           <div className="space-y-[var(--gg-space-4)]">
             <SectionHeader
-              eyebrow="Source registry"
+              eyebrow="Graph inputs"
               title="Current connectors"
-              description="Every live parser feeding the atlas, shown with its source family, cadence, and current implementation status."
+              description="These source pipelines are what keep the map grounded in official records instead of static hand-written content."
             />
             <div className="grid gap-[var(--gg-space-4)]">
               {sourceRegistry.map((entry) => (
